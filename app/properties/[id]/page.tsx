@@ -1,9 +1,12 @@
-import React from "react";
+interface PropertyPageProps {
+  params: Promise<{ id: string[] }>;
+}
 
-export default function PropertyPage() {
+export default async function PropertyPage({ params }: PropertyPageProps) {
+  const { id } = await params;
   return (
     <div>
-      <h1>Property Page</h1>
+      <h1>Property Page {id}</h1>
     </div>
   );
 }
