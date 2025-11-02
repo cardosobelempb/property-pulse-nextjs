@@ -53,8 +53,9 @@ const NavBar = () => {
             <Link className="flex shrink-0 items-center" href={"/"}>
               <Image
                 className="h-10 w-auto"
-                width={40}
-                height={100}
+                width={32}
+                height={32}
+                priority
                 src={logoWhite}
                 alt="PropertyPulse"
               />
