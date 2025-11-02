@@ -1,9 +1,20 @@
+"use client";
+
+import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import logoWhite from "../assets/images/logo-white.png";
 import profileDefault from "../assets/images/profile.png";
 import Link from "next/link";
+import { FaGoogle } from "react-icons/fa";
 
 const NavBar = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Placeholder for authentication state
+
+  const pathname = usePathname();
+
   return (
     <nav className="bg-blue-700 border-b border-blue-500">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -16,6 +27,7 @@ const NavBar = () => {
               className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
               aria-controls="mobile-menu"
               aria-expanded="false"
+              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
             >
               <span className="absolute -inset-0.5"></span>
               <span className="sr-only">Open main menu</span>
@@ -56,155 +68,184 @@ const NavBar = () => {
               <div className="flex space-x-2">
                 <Link
                   href="/"
-                  className="text-white bg-black hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
+                  className={`${
+                    pathname === "/" ? "bg-black" : ""
+                  } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
                 >
                   Home
                 </Link>
                 <Link
                   href="/properties"
-                  className="text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
+                  className={`${
+                    pathname === "/properties" ? "bg-black" : ""
+                  } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
                 >
                   Properties
                 </Link>
-                <Link
-                  href="/add-property"
-                  className="text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
-                >
-                  Add Property
-                </Link>
+                {isLoggedIn && (
+                  <Link
+                    href="/property/add"
+                    className={`${
+                      pathname === "/property/add" ? "bg-black" : ""
+                    } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
+                  >
+                    Add Property
+                  </Link>
+                )}
               </div>
             </div>
           </div>
 
           {/* <!-- Right Side Menu (Logged Out) --> */}
-          <div className="hidden md:block md:ml-6">
-            <div className="flex items-center">
-              <button className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 cursor-pointer">
-                <i className="fa-brands fa-google text-white mr-2"></i>
-                <span>Login or Register</span>
-              </button>
+          {!isLoggedIn && (
+            <div className="hidden md:block md:ml-6">
+              <div className="flex items-center">
+                <button className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 cursor-pointer">
+                  <FaGoogle className="text-white mr-2" />
+                  <span>Login or Register</span>
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* <!-- Right Side Menu (Logged In) --> */}
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 md:static md:inset-auto md:ml-6 md:pr-0 cursor-pointer">
-            <Link href="messages" className="relative group">
-              <button
-                type="button"
-                className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 cursor-pointer"
-              >
-                <span className="absolute -inset-1.5"></span>
-                <span className="sr-only">View notifications</span>
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-                  />
-                </svg>
-              </button>
-              <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
-                2
-                {/* <!-- Replace with the actual number of notifications --> */}
-              </span>
-            </Link>
-            {/* <!-- Profile dropdown button --> */}
-            <div className="relative ml-3">
-              <div>
+          {isLoggedIn && (
+            <div className="absolute inset-y-0 right-0 flex items-center pr-2 md:static md:inset-auto md:ml-6 md:pr-0 cursor-pointer">
+              <Link href="messages" className="relative group">
                 <button
                   type="button"
-                  className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 cursor-pointer"
-                  id="user-menu-button"
-                  aria-expanded="false"
-                  aria-haspopup="true"
+                  className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 cursor-pointer"
                 >
                   <span className="absolute -inset-1.5"></span>
-                  <span className="sr-only">Open user menu</span>
-                  <Image
-                    className="h-8 w-8 rounded-full"
-                    width={32}
-                    height={32}
-                    src={profileDefault}
-                    alt=""
-                  />
+                  <span className="sr-only">View notifications</span>
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
+                    />
+                  </svg>
                 </button>
-              </div>
+                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                  2
+                  {/* <!-- Replace with the actual number of notifications --> */}
+                </span>
+              </Link>
 
-              {/* <!-- Profile dropdown --> */}
-              <div
-                id="user-menu"
-                className="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none cursor-pointer"
-                role="menu"
-                aria-orientation="vertical"
-                aria-labelledby="user-menu-button"
-                tabIndex={-1}
-              >
-                <Link
-                  href="/profile"
-                  className="block px-4 py-2 text-sm text-gray-700 cursor-pointer"
-                  role="menuitem"
-                  tabIndex={-1}
-                  id="user-menu-item-0"
-                >
-                  Your Profile
-                </Link>
-                <Link
-                  href="/saved-properties"
-                  className="block px-4 py-2 text-sm text-gray-700 cursor-pointer"
-                  role="menuitem"
-                  tabIndex={-1}
-                  id="user-menu-item-2"
-                >
-                  Saved Properties
-                </Link>
-                <button
-                  className="block px-4 py-2 text-sm text-gray-700 cursor-pointer"
-                  role="menuitem"
-                  tabIndex={-1}
-                  id="user-menu-item-2"
-                >
-                  Sign Out
-                </button>
+              {/* <!-- Profile dropdown button --> */}
+
+              <div className="relative ml-3">
+                <div>
+                  <button
+                    type="button"
+                    className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 cursor-pointer"
+                    id="user-menu-button"
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                    onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                  >
+                    <span className="absolute -inset-1.5"></span>
+                    <span className="sr-only">Open user menu</span>
+                    <Image
+                      className="h-8 w-8 rounded-full"
+                      width={32}
+                      height={32}
+                      src={profileDefault}
+                      alt=""
+                    />
+                  </button>
+                </div>
+
+                {/* <!-- Profile dropdown --> */}
+                {isProfileMenuOpen && (
+                  <div
+                    id="user-menu"
+                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none cursor-pointer"
+                    role="menu"
+                    aria-orientation="vertical"
+                    aria-labelledby="user-menu-button"
+                    tabIndex={-1}
+                  >
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 cursor-pointer"
+                      role="menuitem"
+                      tabIndex={-1}
+                      id="user-menu-item-0"
+                    >
+                      Your Profile
+                    </Link>
+                    <Link
+                      href="/properties/saved"
+                      className="block px-4 py-2 text-sm text-gray-700 cursor-pointer"
+                      role="menuitem"
+                      tabIndex={-1}
+                      id="user-menu-item-2"
+                    >
+                      Saved Properties
+                    </Link>
+                    <button
+                      className="block px-4 py-2 text-sm text-gray-700 cursor-pointer"
+                      role="menuitem"
+                      tabIndex={-1}
+                      id="user-menu-item-2"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
       {/* <!-- Mobile menu, show/hide based on menu state. --> */}
-      <div className="hidden" id="mobile-menu">
-        <div className="space-y-1 px-2 pb-3 pt-2">
-          <Link
-            href="/"
-            className="bg-black text-white block rounded-md px-3 py-2 text-base font-medium"
-          >
-            Home
-          </Link>
-          <Link
-            href="/properties"
-            className="text-white block rounded-md px-3 py-2 text-base font-medium"
-          >
-            Properties
-          </Link>
-          <Link
-            href="/add-property"
-            className="text-white block rounded-md px-3 py-2 text-base font-medium"
-          >
-            Add Property
-          </Link>
-          <button className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 my-5 cursor-pointer">
-            <i className="fa-brands fa-google mr-2"></i>
-            <span>Login or Register</span>
-          </button>
+      {isMobileMenuOpen && (
+        <div id="mobile-menu">
+          <div className="space-y-1 px-2 pb-3 pt-2">
+            <Link
+              href="/"
+              className={`${
+                pathname === "/" ? "bg-black" : ""
+              } text-white block rounded-md px-3 py-2 text-base font-medium`}
+            >
+              Home
+            </Link>
+            <Link
+              href="/properties"
+              className={`${
+                pathname === "/properties" ? "bg-black" : ""
+              } text-white block rounded-md px-3 py-2 text-base font-medium`}
+            >
+              Properties
+            </Link>
+            {isLoggedIn && (
+              <Link
+                href="/property/add"
+                className={`${
+                  pathname === "/property/add" ? "bg-black" : ""
+                } text-white block rounded-md px-3 py-2 text-base font-medium`}
+              >
+                Add Property
+              </Link>
+            )}
+            {!isLoggedIn && (
+              <button className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 my-5 cursor-pointer">
+                <i className="fa-brands fa-google mr-2"></i>
+                <span>Login or Register</span>
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 };
