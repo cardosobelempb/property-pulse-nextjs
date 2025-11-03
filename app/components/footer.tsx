@@ -1,29 +1,52 @@
+"use client";
+
 import Image from "next/image";
 import logo from "../assets/images/logo.png";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
   const currentYaear = new Date().getFullYear();
+  const pathname = usePathname();
+
   return (
-    <footer className="bg-black dark:bg-gray-200 text-gray-100 dark:text-black py-4 mt-auto">
+    <footer className="bg-gray-100 dark:bg-gray-80000 text-gray-800 dark:text-white py-4 mt-auto">
       <div className="container-xl lg:container mx-auto flex flex-col md:flex-row items-center justify-between px-4">
         <div className="mb-4 md:mb-0">
-          <Image
-            width={32}
-            height={32}
-            priority
-            src={logo}
-            alt="Logo"
-            className="h-8 w-auto"
-          />
+          <Link href="/">
+            <Image
+              width={32}
+              height={32}
+              priority
+              src={logo}
+              alt="Logo"
+              className="h-8 w-auto"
+            />
+          </Link>
         </div>
         <div className="flex flex-wrap justify-center md:justify-start mb-4 md:mb-0">
           <ul className="flex space-x-4">
             <li>
-              <Link href="/properties">Properties</Link>
+              <Link
+                className={`${
+                  pathname === "/properties" ? "bg-black text-white" : ""
+                } px-3 py-2 rounded-md hover:bg-gray-500 dark:hover:bg-gray-700`}
+                href="/properties"
+              >
+                Properties
+              </Link>
             </li>
             <li>
-              <Link href="/terms">Terms of Service</Link>
+              <Link
+                className={`${
+                  pathname === "/terms"
+                    ? "bg-black text-white hover:bg-gray-700 dark:hover:bg-gray-100 hover:text-black hover:dark:text-white"
+                    : ""
+                } px-3 py-2 rounded-md hover:bg-gray-800 hover:text-gray-100 dark:hover:bg-gray-100 dark:hover:text-gray-800`}
+                href="/terms"
+              >
+                Terms of Service
+              </Link>
             </li>
           </ul>
         </div>
