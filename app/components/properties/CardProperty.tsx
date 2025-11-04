@@ -25,7 +25,7 @@ export default function CardProperty({ property }: PropertyCardProps) {
     }
   };
   return (
-    <div className="rounded-xl shadow-md relative">
+    <article className="rounded-xl shadow-md relative">
       <Image
         width={0}
         height={0}
@@ -85,6 +85,6 @@ export default function CardProperty({ property }: PropertyCardProps) {
           </Link>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

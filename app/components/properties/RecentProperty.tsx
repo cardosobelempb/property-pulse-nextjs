@@ -6,7 +6,7 @@ export default function RecentProperty() {
   const recentPrperties = data.slice(0, 3);
   return (
     <>
-      <section className="container-xl lg:container m-auto px-4 py-6">
+      <section className="container-xl lg:container px-4 py-6">
         <h2 className="text-3xl font-bold text-blue-500 mb-6 text-center">
           Recent Properties
         </h2>

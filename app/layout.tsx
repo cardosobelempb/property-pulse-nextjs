@@ -30,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${poppinsSans.variable} antialiased`}>
+      <body className={`${poppinsSans.variable} antialiased bg-blue-50`}>
         <NavBar />
         <MainLayout>{children}</MainLayout>
         <Footer />
