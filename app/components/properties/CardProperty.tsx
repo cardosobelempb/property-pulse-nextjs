@@ -7,13 +7,13 @@ import {
   FaMoneyBill,
   FaMapMarked,
 } from "react-icons/fa";
-import { Property } from "../model/Property";
+import { Property } from "../../model/Property";
 
 interface PropertyCardProps {
   property: Property;
 }
 
-export default function PropertyCard({ property }: PropertyCardProps) {
+export default function CardProperty({ property }: PropertyCardProps) {
   const getRateDisplay = () => {
     const { rates } = property;
     if (rates.monthly) {
