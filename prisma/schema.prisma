@@ -1,9 +1,89 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../app/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String
+  email    String @unique
+  password String
+  phone    String
+  role     Int    @default(1)
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  properties Property[]
+
+  @@map("user")
+}
+
+model Location {
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  street  String
+  city    String
+  state   String
+  zipcode String
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  properties Property[]
+
+  @@map("location")
+}
+
+model Rate {
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  weekly  Float?
+  monthly Float?
+  nightly Float?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  properties Property[]
+
+  @@map("rate")
+}
+
+model Property {
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  owner       String
+  name        String
+  type        String
+  description String
+
+  beds       Int
+  baths      Int
+  squareFeet Float    @map("square_feet")
+  amenities  String[] @db.Text
+
+  images     String[] @db.Text
+  isFeatured Boolean  @default(false) @map("is_featured")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // 🔗 Relacionamentos
+  userId String @map("user_id") @db.Uuid
+  user   User   @relation(fields: [userId], references: [id])
+
+  locationId String?   @map("location_id") @db.Uuid
+  location   Location? @relation(fields: [locationId], references: [id])
+
+  rateId String? @map("rate_id") @db.Uuid
+  rate   Rate?   @relation(fields: [rateId], references: [id])
+
+  @@map("property")
 }
