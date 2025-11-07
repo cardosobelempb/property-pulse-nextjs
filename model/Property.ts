@@ -1,24 +1,23 @@
-import { Location } from "./Location";
-import { Rates } from "./Rates";
+import { Location, Rate } from "@/app/generated/prisma";
 import { SellerInfo } from "./SellerInfo";
 
 export type Property = {
-  _id: string;
-  owner: string;
+  id: string;
   name: string;
   type: string;
   description: string;
-  location: Location;
   beds: number;
   baths: number;
   squareFeet: number;
   amenities: string[];
-  rates: Rates;
-  sellerInfo: SellerInfo;
+  rates: Rate[];
   images: string[];
   isFeatured: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date | null;
+  deletedAt: Date | null;
+  ownerId: string;
+  location: Location;
 };
 
 export type Properties = Property[];

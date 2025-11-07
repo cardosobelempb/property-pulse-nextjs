@@ -1,17 +1,26 @@
-import { data } from "@/data/data";
-import CardProperty from "../components/properties/CardProperty";
+import CardProperty from "@/components/properties/CardProperty";
+import prisma from "@/libs/prisma";
 
-const PropertiesPage = () => {
+const PropertiesPage = async () => {
+  // const rate = await prisma.rate.findMany();
+  // const location = await prisma.location.findMany();
+
+  const properties = await prisma.property.findMany({
+    include: { rates: true, location: true },
+  });
+
+  console.log(properties);
+
   return (
     <section className="container-xl lg:container m-auto px-4 py-6">
       <div className="px-4 py-6">
-        {data.length === 0 ? (
+        {properties.length === 0 ? (
           <p>No properties found</p>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {data.map((property) => (
-                <CardProperty key={property._id} property={property} />
+              {properties.map((property) => (
+                <CardProperty key={property.id} property={property} />
               ))}
             </div>
           </>

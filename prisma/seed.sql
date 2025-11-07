@@ -8,6 +8,7 @@ INSERT INTO
     "user" (
         id,
         name,
+        user_name,
         email,
         password,
         phone,
@@ -16,6 +17,7 @@ INSERT INTO
     )
 VALUES (
         '11111111-1111-1111-1111-111111111111',
+        'John Doe',
         'John Doe',
         'john@gmail.com',
         'hashed_password_1',
@@ -26,6 +28,7 @@ VALUES (
     (
         '22222222-2222-2222-2222-222222222222',
         'David Johnson',
+        'David Johnson',
         'david@gmail.com',
         'hashed_password_2',
         '213-555-5555',
@@ -34,6 +37,7 @@ VALUES (
     ),
     (
         '33333333-3333-3333-3333-333333333333',
+        'Michael Brown',
         'Michael Brown',
         'michael@gmail.com',
         'hashed_password_3',
@@ -44,6 +48,7 @@ VALUES (
     (
         '44444444-4444-4444-4444-444444444444',
         'Robert Anderson',
+        'Robert Anderson',
         'robert@gmail.com',
         'hashed_password_4',
         '303-555-5555',
@@ -52,6 +57,7 @@ VALUES (
     ),
     (
         '55555555-5555-5555-5555-555555555555',
+        'Jennifer Martin',
         'Jennifer Martin',
         'jennifer@gmail.com',
         'hashed_password_5',
@@ -62,6 +68,7 @@ VALUES (
     (
         '66666666-6666-6666-6666-666666666666',
         'Lisa Taylor',
+        'Lisa Taylor',
         'lisa@gmail.com',
         'hashed_password_6',
         '303-555-5555',
@@ -70,6 +77,7 @@ VALUES (
     ),
     (
         '77777777-7777-7777-7777-777777777777',
+        'Matthew Harris',
         'Matthew Harris',
         'matthew@gmail.com',
         'hashed_password_7',
@@ -253,7 +261,6 @@ VALUES (
 INSERT INTO
     "property" (
         id,
-        owner,
         name,
         type,
         description,
@@ -261,7 +268,7 @@ INSERT INTO
         baths,
         square_feet,
         amenities,
-        user_id,
+        owner_id,
         location_id,
         rate_id,
         images,
@@ -270,7 +277,6 @@ INSERT INTO
     )
 VALUES (
         'ccc11111-cccc-cccc-cccc-cccccccccccc',
-        '1',
         'Boston Commons Retreat',
         'Apartment',
         'Beautiful 2 bedroom apartment near the commons, available weekly or monthly.',
@@ -302,7 +308,6 @@ VALUES (
     ),
     (
         'ccc22222-cccc-cccc-cccc-cccccccccccc',
-        '1',
         'Cozy Downtown Loft',
         'Apartment',
         'A cozy downtown loft with great city views.',
@@ -333,7 +338,6 @@ VALUES (
     ),
     (
         'ccc33333-cccc-cccc-cccc-cccccccccccc',
-        '2',
         'Luxury Condo with a View',
         'Condo',
         'Experience luxury in this stunning condo with breathtaking views.',
@@ -365,7 +369,6 @@ VALUES (
     ),
     (
         'ccc44444-cccc-cccc-cccc-cccccccccccc',
-        '2',
         'Charming Cottage Getaway',
         'Cottage Or Cabin',
         'Escape to this charming cottage for a peaceful retreat.',
@@ -387,7 +390,6 @@ VALUES (
     ),
     (
         'ccc55555-cccc-cccc-cccc-cccccccccccc',
-        '3',
         'Modern Downtown Studio',
         'Studio',
         'Stay in style in this modern downtown studio apartment.',
@@ -410,7 +412,6 @@ VALUES (
     ),
     (
         'ccc66666-cccc-cccc-cccc-cccccccccccc',
-        '3',
         'Seaside Retreat',
         'House',
         'Escape to this seaside house for a relaxing getaway.',
@@ -433,7 +434,6 @@ VALUES (
     ),
     (
         'ccc77777-cccc-cccc-cccc-cccccccccccc',
-        '4',
         'Rustic Cabin in the Woods',
         'Cottage Or Cabin',
         'Experience nature in this cozy rustic cabin.',
@@ -455,7 +455,6 @@ VALUES (
     ),
     (
         'ccc88888-cccc-cccc-cccc-cccccccccccc',
-        '5',
         'Ski-In/Ski-Out Chalet',
         'Chalet',
         'Hit the slopes from this cozy ski-in/ski-out chalet.',
@@ -477,7 +476,6 @@ VALUES (
     ),
     (
         'ccc99999-cccc-cccc-cccc-cccccccccccc',
-        '6',
         'Mountain View Retreat',
         'House',
         'Enjoy stunning mountain views from this spacious retreat.',
@@ -500,7 +498,6 @@ VALUES (
     ),
     (
         'ccc00000-cccc-cccc-cccc-cccccccccccc',
-        '7',
         'Historic Downtown Loft',
         'Apartment',
         'Step back in time with a stay in this historic downtown loft.',

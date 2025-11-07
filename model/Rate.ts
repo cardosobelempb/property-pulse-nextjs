@@ -1,4 +1,4 @@
-export type Rates = {
+export type Rate = {
   weekly: number;
   monthly?: number;
   nightly?: number;

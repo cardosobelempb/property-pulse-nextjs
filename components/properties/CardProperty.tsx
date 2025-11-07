@@ -1,11 +1,11 @@
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import {
-  FaBed,
   FaBath,
-  FaRulerCombined,
-  FaMoneyBill,
+  FaBed,
   FaMapMarked,
+  FaMoneyBill,
+  FaRulerCombined,
 } from "react-icons/fa";
 import { Property } from "../../model/Property";
 
@@ -78,7 +78,7 @@ export default function CardProperty({ property }: PropertyCardProps) {
             </span>
           </div>
           <Link
-            href={`property/${property._id}`}
+            href={`property/${property.id}`}
             className="h-9 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-center text-sm"
           >
             Details

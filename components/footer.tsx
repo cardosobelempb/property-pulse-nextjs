@@ -29,8 +29,18 @@ export default function Footer() {
             <li>
               <Link
                 className={`${
+                  pathname === "/" ? "bg-black text-white" : ""
+                } px-3 py-2 rounded-md text-gray-800 hover:text-gray-100 hover:bg-gray-700 dark:hover:bg-gray-800`}
+                href="/"
+              >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                className={`${
                   pathname === "/properties" ? "bg-black text-white" : ""
-                } px-3 py-2 rounded-md hover:bg-gray-500 dark:hover:bg-gray-700`}
+                } px-3 py-2 rounded-md text-gray-800 hover:text-gray-100 hover:bg-gray-700 dark:hover:bg-gray-800`}
                 href="/properties"
               >
                 Properties
@@ -42,7 +52,7 @@ export default function Footer() {
                   pathname === "/terms"
                     ? "bg-black text-white hover:bg-gray-700 dark:hover:bg-gray-100 hover:text-black hover:dark:text-white"
                     : ""
-                } px-3 py-2 rounded-md hover:bg-gray-800 hover:text-gray-100 dark:hover:bg-gray-100 dark:hover:text-gray-800`}
+                } px-3 py-2 rounded-md text-gray-800 hover:text-gray-100 hover:bg-gray-700 dark:hover:bg-gray-800`}
                 href="/terms"
               >
                 Terms of Service

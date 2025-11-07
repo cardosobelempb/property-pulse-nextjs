@@ -9,18 +9,21 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name     String
-  email    String @unique
+  userName String  @map("user_name")
+  email    String  @unique
   password String
   phone    String
-  role     Int    @default(1)
+  image    String?
+  role     Int     @default(1)
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
   properties Property[]
+  bookmarks  UserToPropertyBookMarks[]
 
   @@map("user")
 }
@@ -51,21 +54,21 @@ model Rate {
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  properties Property[]
+  propertyId String?   @db.Uuid
+  property   Property? @relation(fields: [propertyId], references: [id])
 
   @@map("rate")
 }
 
 model Property {
   id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  owner       String
   name        String
   type        String
   description String
 
   beds       Int
   baths      Int
-  squareFeet Float    @map("square_feet")
+  squareFeet Int      @map("square_feet")
   amenities  String[] @db.Text
 
   images     String[] @db.Text
@@ -76,14 +79,32 @@ model Property {
   deletedAt DateTime? @map("deleted_at")
 
   // 🔗 Relacionamentos
-  userId String @map("user_id") @db.Uuid
-  user   User   @relation(fields: [userId], references: [id])
+  ownerId String @map("owner_id") @db.Uuid
+  owner   User   @relation(fields: [ownerId], references: [id])
+  // userId String @map("user_id") @db.Uuid
+  // user   User   @relation(fields: [userId], references: [id])
 
   locationId String?   @map("location_id") @db.Uuid
   location   Location? @relation(fields: [locationId], references: [id])
 
-  rateId String? @map("rate_id") @db.Uuid
-  rate   Rate?   @relation(fields: [rateId], references: [id])
+  rates Rate[]
+
+  bookmarks UserToPropertyBookMarks[]
 
   @@map("property")
+}
+
+model UserToPropertyBookMarks {
+  userId     String @map("user_id") @db.Uuid
+  propertyId String @map("property_id") @db.Uuid
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  @@id([userId, propertyId])
+  @@map("user_to_property_bookmarks")
 }
