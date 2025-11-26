@@ -1,25 +1,38 @@
 import { data } from "@/data/data";
-import CardProperty from "./CardProperty";
 import Link from "next/link";
+import { prisma } from "@/shared";
+import CardProperty from "./CardProperty";
 
-export default function RecentProperty() {
-  const recentPrperties = data.slice(0, 3);
-  console.log(recentPrperties);
+export default async function RecentProperty() {
+  const prismaRecentPrperties = await prisma.property.findMany({
+    include: {
+      rate: true,
+      location: true,
+      images: true,
+      amenities: true,
+      user: true,
+    },
+    take: 3,
+    skip: (1 - 1) * 3,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
   return (
     <>
-      <section className="container-xl lg:container px-4 py-6">
-        <h2 className="text-3xl font-bold text-blue-500 mb-6 text-center">
+      <section className="container-xl lg:container py-6">
+        <h2 className="text-3xl font-bold text-blue-800 dark:text-blue-100 mb-6 text-center">
           Recent Properties
         </h2>
         <div className="px-4 py-6">
-          {recentPrperties.length === 0 ? (
+          {prismaRecentPrperties.length === 0 ? (
             <p>No properties found</p>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* {recentPrperties.map((property) => (
-                  <CardProperty key={property} property={property} />
-                ))} */}
+                {prismaRecentPrperties.map((property) => (
+                  <CardProperty key={property.id} property={property} />
+                ))}
               </div>
             </>
           )}

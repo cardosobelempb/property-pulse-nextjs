@@ -16,8 +16,8 @@ const NavBar = () => {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-blue-700 border-b border-blue-500">
-      <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+    <nav className="bg-blue-800 border-b border-blue-500">
+      <div className="container-xl lg:container mx-0 lg:mx-auto px-4">
         <div className="relative flex h-20 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center md:hidden">
             {/* <!-- Mobile menu button--> */}

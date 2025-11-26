@@ -1,4 +1,4 @@
-import { Properties } from "@/domain/entities/PropertyEntity";
+import { Properties } from "@/domain/entities/Property";
 
 export const data: Properties = [
   {

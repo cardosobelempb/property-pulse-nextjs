@@ -1,9 +1,9 @@
 import { Encrypter } from "./encrypter.abstract";
 import { HashComparer } from "./hash-comparer.abstract";
 import { HashGenerator } from "./hash-generator.abstract";
-import { RepositoryAbstract } from "./repository.abstract";
-import { AggregateRoot } from "./aggregate-root.abstract";
-import { WatchedList } from "./watched-list.abstract";
+import { RepositoryAbstract } from "./RepositoryAbstract";
+import { AggregateAbstract } from "./AggregateAbstract";
+import { WatchedListAbstract } from "./WatchedListAbstract";
 import { AbstractMapper } from "./mapper.abstract";
 import { Hashed } from "./hash.abstract";
 import { I18nAbstract } from "./i18n.abstract";
@@ -13,8 +13,8 @@ export {
   HashComparer,
   HashGenerator,
   AbstractMapper,
-  AggregateRoot,
-  WatchedList,
+  AggregateAbstract,
+  WatchedListAbstract,
   RepositoryAbstract,
   Hashed,
   I18nAbstract,

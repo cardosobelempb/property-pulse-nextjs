@@ -1,12 +1,4 @@
-import {
-  Amenity,
-  Location,
-  Property,
-  Rate,
-  Image as PropertyImage,
-  User,
-} from "@/app/generated/prisma";
-import { PropertyEntity } from "@/domain/entities/PropertyEntity";
+import { Location, Image as PropertyImage, Rate } from "@/app/generated/prisma";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -33,9 +25,7 @@ export interface CardPropertyProps {
 }
 
 export default function CardProperty({ property }: CardPropertyProps) {
-  console.log("Images =>", property.images[0].url);
   const getRateDisplay = () => {
-    console.log(property.rate);
     if (property.rate.monthly) {
       return `$${property.rate.monthly}/mo`;
     } else if (property.rate.weekly) {
@@ -45,7 +35,7 @@ export default function CardProperty({ property }: CardPropertyProps) {
     }
   };
   return (
-    <article className="rounded-xl shadow-md relative">
+    <article className="flex flex-col justify-between rounded-xl shadow-md relative bg-gray-800 text-gray-100 dark:bg-gray-100 dark:text-gray-800">
       <Image
         width={0}
         height={0}
@@ -54,16 +44,18 @@ export default function CardProperty({ property }: CardPropertyProps) {
         alt=""
         className="w-full h-auto rounded-t-xl"
       />
-      <div className="p-4">
-        <div className="text-left md:text-center lg:text-left mb-6">
-          <div className="text-gray-600">{property.type}</div>
-          <h3 className="text-xl font-bold text-gray-800">{property.name}</h3>
+      <div className="flex flex-col justify-between h-full p-4">
+        <div className="text-left md:text-center lg:text-left mb-2">
+          <div className="">{property.type}</div>
+          <h3 className="text-2xl md:text-2xl lg:text-xl xl:text-3xl font-bold">
+            {property.name}
+          </h3>
         </div>
-        <h3 className="absolute top-2.5 right-2.5 bg-white px-4 py-2 rounded-lg text-blue-500 font-bold text-right md:text-center lg:text-right">
+        <h3 className="absolute top-2.5 right-2.5 bg-white px-4 py-2 rounded-lg text-blue-100 dark:text-blue-800 font-bold text-right md:text-center lg:text-right">
           {getRateDisplay()}
         </h3>
 
-        <div className="flex justify-center gap-4 text-gray-500 mb-4">
+        <div className="flex justify-center gap-4 mb-4">
           <p className="">
             <FaBed className="" /> {property.beds}{" "}
             <span className="md:hidden lg:inline">Beds</span>
@@ -79,27 +71,27 @@ export default function CardProperty({ property }: CardPropertyProps) {
           </p>
         </div>
 
-        <div className="flex justify-center gap-4 text-green-900 text-sm mb-4">
-          <p className="flex gap-x-1">
+        <div className="flex justify-center gap-4 text-green-100 dark:text-green-800 text-sm mb-2">
+          <p className="flex items-center gap-x-1">
             <FaMoneyBill className="" /> Weekly
           </p>
-          <p className="flex gap-x-1">
+          <p className="flex items-center gap-x-1">
             <FaMoneyBill className="" /> Monthly
           </p>
         </div>
 
-        <div className="border border-gray-100 mb-5"></div>
+        <div className="border border-gray-100 dark:border-b-gray-800 mb-2"></div>
 
         <div className="flex flex-col lg:flex-row justify-between mb-4">
-          <div className="flex align-middle gap-2 mb-4 lg:mb-0">
-            <FaMapMarked className="text-lg text-orange-700" />
-            <span className="text-orange-700">
+          <div className="flex align-middle items-center gap-2 mb-4 lg:mb-0 text-orange-100 dark:text-orange-800">
+            <FaMapMarked className="text-lg " />
+            <span className="">
               {property.location?.city} {property.location?.state}
             </span>
           </div>
           <Link
-            href={`property/${property.id}`}
-            className="h-9 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-center text-sm"
+            href={`properties/${property.id}`}
+            className="h-9 bg-blue-700 hover:bg-blue-800 dark:bg-blue-800 hover:dark:bg-blue-700 text-white px-4 py-2 rounded-lg text-center text-sm"
           >
             Details
           </Link>

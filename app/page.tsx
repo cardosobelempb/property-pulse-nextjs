@@ -1,13 +1,10 @@
-import Hero from "@/components/hero";
-import InfoBoxes from "@/components/info-boxes";
-import RecentProperty from "@/components/properties/RecentProperty";
+import { MainLayout } from "@/components/layout/MainLayout";
+import HomePage from "./home/page";
 
-export default function HomePage() {
+export default function RootPage() {
   return (
     <>
-      <Hero />
-      <InfoBoxes />
-      <RecentProperty />
+      <HomePage />
     </>
   );
 }

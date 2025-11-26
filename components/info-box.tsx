@@ -28,7 +28,7 @@ export default function InfoBox({
       <Link
         href={btn.href || "#"}
         className={cn(
-          `inline-block rounded-lg px-4 py-2 `,
+          `inline-block rounded-lg px-4 py-2`,
           btn.backgroundColor,
           btn.textColor
         )}

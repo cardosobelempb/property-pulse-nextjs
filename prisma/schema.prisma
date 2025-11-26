@@ -1,3 +1,6 @@
+// ======================================================
+// 🔧 Configurações principais do Prisma
+// ======================================================
 generator client {
   provider = "prisma-client-js"
   output   = "../app/generated/prisma"
@@ -8,20 +11,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ===============================
-// 🧑‍💼 Informações do user (1:1)
-// ===============================
+// ======================================================
+// 🧑‍💼 User — Usuários da aplicação (1:N com Property)
+// ======================================================
 model User {
-  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  firstName  String     @map("first_name")
-  lastName   String     @map("last_name")
-  email      String     @unique
-  password   String
-  phone      String
-  image      String?
-  role       Int        @default(1)
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  // Dados pessoais
+  firstName String  @map("first_name")
+  lastName  String  @map("last_name")
+  email     String  @unique
+  password  String
+  phone     String
+  image     String?
+
+  // Regra de acesso
+  role Int @default(1)
+
+  // Relacionamentos
   properties Property[]
 
+  // Auditoria
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
@@ -29,17 +39,21 @@ model User {
   @@map("user")
 }
 
-// ===============================
-// 📍 Localização (1:1)
-// ===============================
+// ======================================================
+// 📍 Location — Dados de endereço (1:N com Property)
+// ======================================================
 model Location {
-  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  street     String
-  city       String
-  state      String
-  zipcode    String
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  street  String
+  city    String
+  state   String
+  zipcode String
+
+  // Relacionamentos
   properties Property[]
 
+  // Auditoria
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
@@ -47,14 +61,16 @@ model Location {
   @@map("location")
 }
 
-// ===============================
-// 💰 Tarifas (1:1)
-// ===============================
+// ======================================================
+// 💰 Rate — Tarifas (1:N com Property)
+// ======================================================
 model Rate {
-  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  weekly     Float?
-  monthly    Float?
-  nightly    Float?
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  weekly  Float?
+  monthly Float?
+  nightly Float?
+
   properties Property[]
 
   createdAt DateTime  @default(now()) @map("created_at")
@@ -64,21 +80,26 @@ model Rate {
   @@map("rate")
 }
 
-// ===============================
-// 🧺 Amenidades (N:N)
-// ===============================
+// ======================================================
+// 🧺 Amenity — Amenidades (N:N via PropertyAmenity)
+// ======================================================
 model Amenity {
-  id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name              String            @unique
-  createdAt         DateTime          @default(now()) @map("created_at")
-  updatedAt         DateTime?         @updatedAt @map("updated_at")
-  deletedAt         DateTime?         @map("deleted_at")
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique
+
+  // Relacionamento N:N
   propertyAmenities PropertyAmenity[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("amenity")
 }
 
-// Tabela de junção explícita
+// ======================================================
+// 🔗 Tabela de junção N:N explícita
+// ======================================================
 model PropertyAmenity {
   propertyId String   @map("property_id") @db.Uuid
   property   Property @relation(fields: [propertyId], references: [id])
@@ -90,41 +111,54 @@ model PropertyAmenity {
   @@map("property_amenity")
 }
 
-// ===============================
-// 🖼️ Imagens (1:N)
-// ===============================
+// ======================================================
+// 🖼️ Image — Imagens de um imóvel (1:N)
+// ======================================================
 model Image {
   id  String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   url String @db.Text
+
+  propertyId String   @map("property_id") @db.Uuid
+  property   Property @relation(fields: [propertyId], references: [id])
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  propertyId String   @map("property_id") @db.Uuid
-  property   Property @relation(fields: [propertyId], references: [id])
-
   @@map("image")
 }
 
+// ======================================================
+// 🏡 Property — Imóvel (relaciona tudo)
+// ======================================================
 model Property {
-  id          String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  // Dados gerais
   name        String
   type        String
   description String
-  beds        Int
-  baths       Int
-  squareFeet  Int               @map("square_feet")
-  isFeatured  Boolean           @default(false) @map("is_featured")
-  rateId      String            @map("rate_id") @db.Uuid
-  rate        Rate              @relation(fields: [rateId], references: [id])
-  locationId  String            @map("location_id") @db.Uuid
-  location    Location          @relation(fields: [locationId], references: [id])
-  userId      String            @map("user_id") @db.Uuid
-  user        User              @relation(fields: [userId], references: [id])
-  images      Image[]
-  amenities   PropertyAmenity[]
 
+  // Características físicas
+  beds       Int
+  baths      Int
+  squareFeet Int     @map("square_feet")
+  isFeatured Boolean @default(false) @map("is_featured")
+
+  // Relacionamentos
+  rateId String @map("rate_id") @db.Uuid
+  rate   Rate   @relation(fields: [rateId], references: [id])
+
+  locationId String   @map("location_id") @db.Uuid
+  location   Location @relation(fields: [locationId], references: [id])
+
+  userId String @map("user_id") @db.Uuid
+  user   User   @relation(fields: [userId], references: [id])
+
+  images    Image[]
+  amenities PropertyAmenity[]
+
+  // Auditoria
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
