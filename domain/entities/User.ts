@@ -78,10 +78,6 @@ export class User extends Entity<UserProps> {
     this.props.role = role;
   }
 
-  set orders(orders: Order[]) {
-    this.props.orders = orders;
-  }
-
   get createdAt() {
     return this.props.createdAt;
   }
@@ -99,12 +95,16 @@ export class User extends Entity<UserProps> {
   }
 
   static create(
-    props: Optional<UserProps, "createdAt" | "deletedAt" | "updatedAt">,
+    props: Optional<
+      UserProps,
+      "orders" | "createdAt" | "deletedAt" | "updatedAt"
+    >,
     id?: UUIDVO
   ) {
     const user = new User(
       {
         ...props,
+        orders: props.orders ?? [],
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? null,
         deletedAt: props.deletedAt ?? null,

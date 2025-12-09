@@ -215,9 +215,11 @@ enum OrderStatus {
 model Order {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  status   OrderStatus @default(WAITING_PAYMENT)
-  clientId String      @unique @map("client_id") @db.Uuid
-  client   User        @relation(fields: [clientId], references: [id])
+  status  OrderStatus @default(WAITING_PAYMENT)
+  payment Payment?
+
+  clientId String @unique @map("client_id") @db.Uuid
+  client   User   @relation(fields: [clientId], references: [id])
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -227,9 +229,11 @@ model Order {
 }
 
 model Payment {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   status String
+
+  orderId String @unique @map("order_id") @db.Uuid
+  order   Order  @relation(fields: [orderId], references: [id])
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")

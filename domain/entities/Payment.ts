@@ -1,16 +1,12 @@
 import { Entity, Optional, UUIDVO } from "@/shared";
-import { OrderStatus } from "./enums/OrderStatus";
-import { Payment } from "./Payment";
-import { User } from "./User";
+import { Order } from "./Order";
 
 /**
  * Tipagem oficial da entidade Property no domínio.
  * Esta tipagem representa o estado REAL da entidade, nunca um DTO externo.
  */
-export type OrderProps = {
-  status: OrderStatus;
-  client: User;
-  payment: Payment;
+export type PaymentProps = {
+  order: Order | null;
   createdAt: Date;
   updatedAt: Date | null;
   deletedAt: Date | null;
@@ -25,21 +21,13 @@ export type OrderProps = {
  *  - Mutação deve passar por invariantes.
  *  - O agregado é responsável pela coerência interna.
  */
-export class Order extends Entity<OrderProps> {
+export class Payment extends Entity<PaymentProps> {
   // ----------------------
   // 🌱 Getters públicos
   // ----------------------
 
-  get status() {
-    return this.props.status;
-  }
-
-  get client() {
-    return this.props.client;
-  }
-
-  get payment() {
-    return this.props.payment;
+  get order() {
+    return this.props.order;
   }
 
   get createdAt() {
@@ -56,17 +44,11 @@ export class Order extends Entity<OrderProps> {
   // ✏ Mutação controlada (invariantes)
   // ----------------------
 
-  updateStatus(status: OrderStatus) {
-    if (!status) throw new Error("OrderStatus name cannot be empty.");
-    this.props.status = status;
-    this.touch();
-  }
-
-  updateClient(client: User) {
-    if (!client) throw new Error("Client name cannot be empty.");
-    this.props.client = client;
-    this.touch();
-  }
+  // updateName(name: string) {
+  //   if (!name.trim()) throw new Error("Property name cannot be empty.");
+  //   this.props.name = name.trim();
+  //   this.touch();
+  // }
 
   softDelete() {
     this.props.deletedAt = new Date();
@@ -88,15 +70,15 @@ export class Order extends Entity<OrderProps> {
    */
   static create(
     props: Optional<
-      OrderProps,
-      "status" | "createdAt" | "deletedAt" | "updatedAt"
+      PaymentProps,
+      "order" | "createdAt" | "deletedAt" | "updatedAt"
     >,
     id?: UUIDVO
   ) {
-    return new Order(
+    return new Payment(
       {
         ...props,
-        status: props.status ?? OrderStatus.WAITING_PAYMENT,
+        order: props.order ?? null,
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? null,
         deletedAt: props.deletedAt ?? null,
