@@ -13,16 +13,24 @@ datasource db {
 
 // ======================================================
 // 🧑‍💼 User — Usuários da aplicação (1:N com Property)
+// 🧑‍💼 Order — Usuários da aplicação (1:N com Order)
 // ======================================================
+enum Roles {
+  ADMIN
+  CLIENT
+  SUPPLIER
+}
+
 model User {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
   // Dados pessoais
-  firstName String  @map("first_name")
-  lastName  String  @map("last_name")
-  email     String  @unique
+  firstName String    @map("first_name")
+  lastName  String    @map("last_name")
+  email     String    @unique
   password  String
   phone     String
+  birthDate DateTime? @map("birth_date")
   image     String?
 
   // Regra de acesso
@@ -30,6 +38,7 @@ model User {
 
   // Relacionamentos
   properties Property[]
+  orders     Order[]
 
   // Auditoria
   createdAt DateTime  @default(now()) @map("created_at")
@@ -164,4 +173,81 @@ model Property {
   deletedAt DateTime? @map("deleted_at")
 
   @@map("property")
+}
+
+model Product {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  name        String
+  description String
+  price       Float?
+  imgUrl      String @map("img_url")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("products")
+}
+
+model Category {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  name        String
+  description String
+  imgUrl      String @map("img_url")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("categories")
+}
+
+enum OrderStatus {
+  WAITING_PAYMENT
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELED
+}
+
+model Order {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  status   OrderStatus @default(WAITING_PAYMENT)
+  clientId String      @unique @map("client_id") @db.Uuid
+  client   User        @relation(fields: [clientId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("orders")
+}
+
+model Payment {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  status String
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("payment")
+}
+
+model OrderItem {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  name        String
+  description String
+  imgUrl      String @map("img_url")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("order_item")
 }

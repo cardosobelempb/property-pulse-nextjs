@@ -1,6 +1,7 @@
 import { Entity, Optional, UUIDVO } from "@/shared";
 
 export interface RateProps {
+  id?: UUIDVO;
   weekly?: number;
   monthly?: number;
   nightly?: number;

@@ -1,13 +1,11 @@
-import { Entity, UUIDVO, WatchedListAbstract } from "@/shared";
+import { WatchedListAbstract } from "@/shared";
 import { PropertyAmenity } from "./PropertyAmenity";
 
-export interface PropertyAmenityProps {
-  propertyId: string;
-  amenityId: string;
-}
-
 export class PropertyAmenityList extends WatchedListAbstract<PropertyAmenity> {
+  protected getItemKey(item: PropertyAmenity): string {
+    return item.id.getValue();
+  }
   compareItems(a: PropertyAmenity, b: PropertyAmenity): boolean {
-    return a.propertyId.equals(b.propertyId);
+    return a.amenityId.equals(b.amenityId);
   }
 }

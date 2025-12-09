@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PropertyPrismaRepository } from "@/infra/prisma/repositories/PropertyPrismaRepository";
+import { PropertyPrismaRepository } from "@/domain/application/repositories/prisma/repositories/PropertyPrismaRepository";
 import { CreatePropertyUseCase } from "@/application/use-cases/property/CreatePropertyUseCase";
 import { FindAllPropertyUseCase } from "@/application/use-cases/property/FindAllPropertyUseCase";
 

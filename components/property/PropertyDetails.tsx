@@ -1,12 +1,7 @@
-import { Amenity } from "@/domain/entities/Amenity";
-import { Location } from "@/domain/entities/Location";
-import { Rate } from "@/domain/entities/Rate";
+import { PropertyHttpResponse } from "@/infra/presenters/PropertyPresenter";
 import { FaBath, FaBed, FaCheck, FaRulerCombined } from "react-icons/fa";
 import { FaLocationDot, FaXmark } from "react-icons/fa6";
 import { BoxLayout } from "../layout/BoxLayout";
-import { Image } from "@/domain/entities/Image";
-import { PropertyAmenityList } from "@/domain/entities/PropertyAmenityList";
-import { PropertyHttpResponse } from "@/infra/presenters/property.presenter";
 
 export interface PropertyDetailsProps {
   property: PropertyHttpResponse;
@@ -15,6 +10,7 @@ export interface PropertyDetailsProps {
 export default async function PropertyDetails({
   property,
 }: PropertyDetailsProps) {
+  // console.log("Property =>", property);
   return (
     <BoxLayout className="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9">
       <div className="bg-white p-6 rounded-lg shadow-md text-center md:text-left">
@@ -23,8 +19,8 @@ export default async function PropertyDetails({
         <div className="text-gray-500 mb-4 flex align-middle justify-center md:justify-start">
           <FaLocationDot className="text-lg text-orange-700 mr-2" />
           <p className="text-orange-700 flex gap-x-1.5 items-center">
-            {property?.location?.street}, {property?.location?.city}{" "}
-            {property?.location?.zipcode}
+            {property?.location?.street}, {property?.location?.city}
+            {property?.location?.zipCode}
           </p>
         </div>
 
@@ -34,7 +30,7 @@ export default async function PropertyDetails({
         <div className="flex flex-col md:flex-row justify-around">
           <div className="flex items-center justify-center mb-4 border-b border-gray-200 md:border-b-0 pb-4 md:pb-0">
             <div className="text-gray-500 mr-2 font-bold">Nightly</div>
-            {property.rate.nightly ? (
+            {property.rate?.nightly ? (
               `$${property.rate.nightly.toLocaleString()}`
             ) : (
               <div className="text-2xl font-bold text-blue-500">
@@ -45,7 +41,7 @@ export default async function PropertyDetails({
           <div className="flex items-center justify-center mb-4 border-b border-gray-200 md:border-b-0 pb-4 md:pb-0">
             <div className="text-gray-500 mr-2 font-bold">Weekly</div>
             <div className="text-2xl font-bold text-blue-500">
-              {property.rate.weekly ? (
+              {property.rate?.weekly ? (
                 `$${property.rate.weekly.toLocaleString()}`
               ) : (
                 <div className="text-2xl font-bold">
@@ -57,7 +53,7 @@ export default async function PropertyDetails({
           <div className="flex items-center justify-center mb-4 pb-4 md:pb-0">
             <div className="text-gray-500 mr-2 font-bold">Monthly</div>
             <div className="text-2xl font-bold text-blue-500">
-              {property.rate.monthly ? (
+              {property.rate?.monthly ? (
                 `$${property.rate.monthly.toLocaleString()}`
               ) : (
                 <div className="text-2xl font-bold">
@@ -92,14 +88,20 @@ export default async function PropertyDetails({
       <div className="bg-white p-6 rounded-lg shadow-md mt-6">
         <h3 className="text-lg font-bold mb-6">Amenities</h3>
 
-        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 list-none">
-          {property.amenities?.getItems().map((amenity) => (
-            <li key={`${amenity.id}`} className="flex items-center gap-x-1.5">
-              <FaCheck className="text-green-600" />
-              {amenity.name}
-            </li>
-          ))}
-        </ul>
+        {/* <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 list-none">
+          {property.amenities.map((amenity) => {
+            // console.log(amenity);
+            return (
+              <li
+                key={`${amenity.amenityId.getValue()}`}
+                className="flex items-center gap-x-1.5"
+              >
+                <FaCheck className="text-green-600" />
+                {amenity.name}
+              </li>
+            );
+          })}
+        </ul> */}
       </div>
       {/* <!-- Map --> */}
       <div className="bg-white p-6 rounded-lg shadow-md mt-6">

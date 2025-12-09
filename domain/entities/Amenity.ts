@@ -1,14 +1,13 @@
 import { Entity, Optional, UUIDVO } from "@/shared";
 
 export interface AmenityProps {
-  id?: UUIDVO;
   name: string;
   createdAt: Date;
-  updatedAt?: Date | null | undefined;
-  deletedAt?: Date | null | undefined;
+  updatedAt?: Date | null;
+  deletedAt?: Date | null;
 }
 
-export class Amenity<Props extends AmenityProps> extends Entity<Props> {
+export class Amenity extends Entity<AmenityProps> {
   get name() {
     return this.props.name;
   }
@@ -34,14 +33,15 @@ export class Amenity<Props extends AmenityProps> extends Entity<Props> {
   }
 
   static create(
-    props: Optional<AmenityProps, "createdAt" | "name">,
+    props: Optional<AmenityProps, "createdAt" | "updatedAt" | "deletedAt">,
     id?: UUIDVO
   ) {
     const amenity = new Amenity(
       {
         ...props,
-        name: props.name ?? "",
         createdAt: props.createdAt ?? new Date(),
+        updatedAt: props.updatedAt ?? null,
+        deletedAt: props.createdAt ?? null,
       },
       id
     );

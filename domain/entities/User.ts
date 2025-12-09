@@ -1,4 +1,5 @@
 import { Entity, Optional, UUIDVO } from "@/shared";
+import { Order } from "./Order";
 
 export interface UserProps {
   id?: string;
@@ -8,7 +9,9 @@ export interface UserProps {
   password?: string | null;
   phone: string;
   image: string;
+  birthDate: Date;
   role: number;
+  orders: Order[];
   createdAt: Date;
   updatedAt?: Date | null;
   deletedAt?: Date | null;
@@ -51,6 +54,14 @@ export class User extends Entity<UserProps> {
     this.props.phone = phone;
   }
 
+  get birthDate() {
+    return this.props.birthDate;
+  }
+
+  set birthDate(birthDate: Date) {
+    this.props.birthDate = birthDate;
+  }
+
   get image() {
     return this.props.image;
   }
@@ -65,6 +76,10 @@ export class User extends Entity<UserProps> {
 
   set role(role: number) {
     this.props.role = role;
+  }
+
+  set orders(orders: Order[]) {
+    this.props.orders = orders;
   }
 
   get createdAt() {

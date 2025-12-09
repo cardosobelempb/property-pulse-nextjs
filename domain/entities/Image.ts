@@ -1,6 +1,7 @@
 import { Entity, Optional, UUIDVO } from "@/shared";
 
 export interface ImageProps {
+  id?: UUIDVO;
   propertyId: UUIDVO;
   url: string;
   createdAt: Date;

@@ -1,8 +1,8 @@
 import { User } from "@/domain/entities/User";
-import { UserRepository } from "../../../domain/repositories/UserRepository";
+import { UserRepository } from "../UserRepository";
 
 import { IPagination, prisma } from "@/shared";
-import { UserMapper } from "@/infra/prisma/mappers/UserMapper";
+import { UserMapper } from "@/domain/application/repositories/mappers/UserMapper";
 
 export class UserPrismaRepository implements UserRepository {
   async findByName(firstName: string): Promise<User | null> {

@@ -1,10 +1,25 @@
 // src/application/use-cases/CreatePropertyUseCase.ts
-import { PropertyRepository } from "@/domain/repositories/PropertyRepository";
-import { PropertyEntity, PropertyProps } from "@/domain/entities/Property";
+import { PropertyRepository } from "@/domain/application/repositories/PropertyRepository";
+import { Property } from "@/domain/entities/Property";
+import { UUIDVO } from "@/shared";
 
-interface CreatePropertyRequest {
-  name: string;
-  description?: string;
+export namespace CreateProperty {
+  export interface Request {
+    name: string;
+    description: string;
+    baths: number;
+    beds: number;
+    type: string;
+    isFeatured: boolean;
+    squareFeet: number;
+    locationId: string;
+    rateId: string;
+    userId: string;
+  }
+
+  export interface Response {
+    property: Property;
+  }
 }
 
 export class CreatePropertyUseCase {
@@ -21,24 +36,24 @@ export class CreatePropertyUseCase {
     locationId,
     rateId,
     userId,
-  }: PropertyProps): Promise<PropertyEntity> {
+  }: CreateProperty.Request): Promise<CreateProperty.Response> {
     const existing = await this.repository.findById(name);
     if (existing) throw new Error("Já existe uma propriedade com esse nome.");
 
-    const property = PropertyEntity.create({
+    const property = Property.create({
       baths,
       beds,
       description,
       isFeatured,
-      locationId,
+      locationId: new UUIDVO(locationId),
       name,
-      rateId,
+      rateId: new UUIDVO(rateId),
       squareFeet,
       type,
-      userId,
+      userId: new UUIDVO(userId),
     });
     await this.repository.create(property);
 
-    return property;
+    return { property };
   }
 }

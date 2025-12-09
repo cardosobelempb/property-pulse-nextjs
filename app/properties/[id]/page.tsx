@@ -1,5 +1,4 @@
 import FormSearch from "@/components/shared/FormSearch";
-import prisma from "@/shared/config/database/prisma";
 
 import Aside from "@/components/Aside";
 import { BoxLayout } from "@/components/layout/BoxLayout";
@@ -9,8 +8,8 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import LinkBack from "@/components/LinkBack";
 import PropertyDetails from "@/components/property/PropertyDetails";
 import PropertyHeader from "@/components/property/PropertyHeader";
-import { PropertyPrismaRepository } from "@/infra/prisma/repositories/PropertyPrismaRepository";
-import { PropertyPresenter } from "@/infra/presenters/property.presenter";
+import { PropertyPrismaRepository } from "@/domain/application/repositories/prisma";
+import { PropertyPresenter } from "@/infra/presenters/PropertyPresenter";
 interface PropertyPageProps {
   params: Promise<{ id: string }>;
 }
@@ -25,7 +24,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
   if (!property) throw new Error("Property não encontrada.");
 
   const propertyPresenter = PropertyPresenter.toHTTP(property);
-  console.log("PropertyPresenter =>", propertyPresenter);
+  // console.log("PropertyPresenter =>", propertyPresenter);
 
   return (
     <MainLayout className="">

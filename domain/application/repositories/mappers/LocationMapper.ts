@@ -10,7 +10,7 @@ export class LocationMapper {
         state: raw.state,
         city: raw.city,
         street: raw.street,
-        zipcode: raw.zipcode,
+        zipCode: raw.zipcode,
       },
       new UUIDVO(raw.id)
     );
@@ -22,7 +22,7 @@ export class LocationMapper {
       state: entity.state,
       city: entity.city,
       street: entity.street,
-      zipcode: entity.zipcode,
+      zipcode: entity.zipCode,
     };
   }
 }
