@@ -2,8 +2,8 @@ import { Entity, Optional, UUIDVO } from "@/shared";
 import { Order } from "./Order";
 
 /**
- * Tipagem oficial da entidade Property no domínio.
- * Esta tipagem representa o estado REAL da entidade, nunca um DTO externo.
+ * Estado real da entidade Payment no domínio.
+ * Nunca representa DTO externo.
  */
 export type PaymentProps = {
   order: Order | null;
@@ -13,30 +13,32 @@ export type PaymentProps = {
 };
 
 /**
- * Entidade de domínio Property
+ * Entidade de domínio Payment
  *
- * Regras importantes:
- *  - Nunca aceitar DTO cru do ORM.
- *  - Collection interna deve ser sempre entidade válida.
- *  - Mutação deve passar por invariantes.
- *  - O agregado é responsável pela coerência interna.
+ * Regras:
+ * - Pode ou não estar associado a um Order (conforme regra de negócio)
+ * - Mutação deve ser controlada por invariantes
+ * - Datas sempre normalizadas
+ * - Soft delete idempotente
  */
 export class Payment extends Entity<PaymentProps> {
   // ----------------------
   // 🌱 Getters públicos
   // ----------------------
 
-  get order() {
+  get order(): Order | null {
     return this.props.order;
   }
 
-  get createdAt() {
+  get createdAt(): Date {
     return this.props.createdAt;
   }
-  get updatedAt() {
+
+  get updatedAt(): Date | null {
     return this.props.updatedAt;
   }
-  get deletedAt() {
+
+  get deletedAt(): Date | null {
     return this.props.deletedAt;
   }
 
@@ -44,42 +46,64 @@ export class Payment extends Entity<PaymentProps> {
   // ✏ Mutação controlada (invariantes)
   // ----------------------
 
-  // updateName(name: string) {
-  //   if (!name.trim()) throw new Error("Property name cannot be empty.");
-  //   this.props.name = name.trim();
-  //   this.touch();
-  // }
+  /**
+   * Associação com Order deve ser controlada explicitamente.
+   * Evita ciclos perigosos e inconsistência.
+   */
+  assignOrder(order: Order): void {
+    if (!order) {
+      throw new Error("Payment: order cannot be null.");
+    }
 
-  softDelete() {
+    // Evita associações duplicadas
+    if (this.props.order?.equals(order)) return;
+
+    this.props.order = order;
+    this.touch();
+  }
+
+  /**
+   * Desassocia o pagamento de um pedido.
+   * Útil para cenários administrativos.
+   */
+  removeOrder(): void {
+    if (!this.props.order) return;
+
+    this.props.order = null;
+    this.touch();
+  }
+
+  /**
+   * Soft-delete idempotente com preservação do histórico.
+   */
+  softDelete(): void {
+    if (this.props.deletedAt) return; // evita sobrescrever
     this.props.deletedAt = new Date();
     this.touch();
   }
 
-  /** Atualiza o campo updatedAt e preserva consistência */
-  private touch() {
+  /** Mantém updatedAt sempre coerente com mutações */
+  private touch(): void {
     this.props.updatedAt = new Date();
   }
 
   // ----------------------
-  // 🏗 Factory Method
+  // 🏗 Factory Method (criação segura)
   // ----------------------
 
-  /**
-   * Criação segura da entidade.
-   * Nunca recebe DTO direto do ORM sem mapper.
-   */
   static create(
     props: Optional<
       PaymentProps,
-      "order" | "createdAt" | "deletedAt" | "updatedAt"
+      "order" | "createdAt" | "updatedAt" | "deletedAt"
     >,
     id?: UUIDVO
-  ) {
+  ): Payment {
+    const now = new Date();
+
     return new Payment(
       {
-        ...props,
         order: props.order ?? null,
-        createdAt: props.createdAt ?? new Date(),
+        createdAt: props.createdAt ?? now,
         updatedAt: props.updatedAt ?? null,
         deletedAt: props.deletedAt ?? null,
       },
@@ -87,3 +111,14 @@ export class Payment extends Entity<PaymentProps> {
     );
   }
 }
+
+/*
+const payment = Payment.create({});
+
+payment.assignOrder(order);
+
+payment.softDelete();
+
+// remover associação
+payment.removeOrder();
+*/

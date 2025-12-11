@@ -181,13 +181,16 @@ model Product {
   name        String
   description String
   price       Float?
-  imgUrl      String @map("img_url")
+  image       String @map("image")
 
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+  createdAt  DateTime          @default(now()) @map("created_at")
+  updatedAt  DateTime?         @updatedAt @map("updated_at")
+  deletedAt  DateTime?         @map("deleted_at")
+  orderItems OrderItem[]
+  categories ProductCategory[]
+  categoryId String?           @db.Uuid
 
-  @@map("products")
+  @@map("product")
 }
 
 model Category {
@@ -195,13 +198,29 @@ model Category {
 
   name        String
   description String
-  imgUrl      String @map("img_url")
+  image       String            @map("image")
+  products    ProductCategory[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  @@map("categories")
+  @@map("category")
+}
+
+model ProductCategory {
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  productId String  @map("product_id") @db.Uuid
+  product   Product @relation(fields: [productId], references: [id])
+
+  categoryId String   @map("category_id") @db.Uuid
+  amenity    Category @relation(fields: [categoryId], references: [id])
+
+  @@id([productId, categoryId])
+  @@map("product_category")
 }
 
 enum OrderStatus {
@@ -221,11 +240,12 @@ model Order {
   clientId String @unique @map("client_id") @db.Uuid
   client   User   @relation(fields: [clientId], references: [id])
 
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime?   @updatedAt @map("updated_at")
+  deletedAt  DateTime?   @map("deleted_at")
+  orderItems OrderItem[]
 
-  @@map("orders")
+  @@map("order")
 }
 
 model Payment {
@@ -243,15 +263,19 @@ model Payment {
 }
 
 model OrderItem {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-
-  name        String
-  description String
-  imgUrl      String @map("img_url")
+  quantity Int
+  price    Float
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
+  productId String  @map("product_id") @db.Uuid
+  product   Product @relation(fields: [productId], references: [id])
+
+  orderId String @map("order_id") @db.Uuid
+  amenity Order  @relation(fields: [orderId], references: [id])
+
+  @@id([productId, orderId])
   @@map("order_item")
 }

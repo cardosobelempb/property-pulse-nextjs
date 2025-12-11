@@ -1,119 +1,80 @@
 import { AggregateAbstract, Optional, UUIDVO } from "@/shared";
 import { Image } from "./Image";
-import { PropertyAmenity } from "./PropertyAmenity";
-import { Rate } from "./Rate";
-import { Location } from "./Location";
-import { User } from "./User";
-import { PropertyAmenityList } from "./PropertyAmenityList";
+import { Category } from "./Category";
+import { OrderItem } from "./OrderItem";
+import { Order } from "./Order";
 
 /**
- * Tipagem oficial da entidade Property no domínio.
- * Esta tipagem representa o estado REAL da entidade, nunca um DTO externo.
+ * Tipagem oficial da entidade Product no domínio.
  */
-export type PropertyProps = {
+export type ProductProps = {
   name: string;
-  type: string;
   description: string;
-  beds: number;
-  baths: number;
-  squareFeet: number;
-  amenities: PropertyAmenityList;
+  price: number;
+
   images: Image[];
-  rateId: UUIDVO;
-  rate: Rate | null;
-  isFeatured: boolean;
-  locationId: UUIDVO;
-  location: Location | null;
-  userId: UUIDVO;
-  user: User | null;
+  categories: Category[];
+
+  /** espelhando @OneToMany(mappedBy="id.product") */
+  items: OrderItem[];
+
   createdAt: Date;
   updatedAt: Date | null;
   deletedAt: Date | null;
 };
 
 /**
- * Entidade de domínio Property
+ * Entidade Product (Aggregate Root)
  *
- * Regras importantes:
- *  - Nunca aceitar DTO cru do ORM.
- *  - Collection interna deve ser sempre entidade válida.
- *  - Mutação deve passar por invariantes.
- *  - O agregado é responsável pela coerência interna.
+ * Agora com:
+ *  - items: OrderItem[]
+ *  - getOrders()
+ *  - addItem/removeItem
  */
-export class Property extends AggregateAbstract<PropertyProps> {
+export class Product extends AggregateAbstract<ProductProps> {
   // ----------------------
   // 🌱 Getters públicos
   // ----------------------
 
-  get name() {
+  get name(): string {
     return this.props.name;
   }
-  get type() {
-    return this.props.type;
-  }
-  get description() {
+
+  get description(): string {
     return this.props.description;
   }
-  get beds() {
-    return this.props.beds;
-  }
-  get baths() {
-    return this.props.baths;
-  }
-  get squareFeet() {
-    return this.props.squareFeet;
+
+  get price(): number {
+    return this.props.price;
   }
 
-  /**
-   * Importante: retorno uma cópia superficial
-   * para evitar mutação externa inadvertida.
-   */
-  // get amenities() {
-  //   return [...this.props.amenities];
-  // }
-
-  get amenities() {
-    return this.props.amenities;
-  }
-
-  get images() {
+  get images(): Image[] {
     return [...this.props.images];
   }
 
-  get isFeatured() {
-    return this.props.isFeatured;
-  }
-  get rateId() {
-    return this.props.rateId;
+  get categories(): Category[] {
+    return [...this.props.categories];
   }
 
-  get rate() {
-    return this.props.rate;
+  /** igual ao public Set<OrderItem> getItems() do JPA */
+  get items(): OrderItem[] {
+    return [...this.props.items];
   }
 
-  get userId() {
-    return this.props.userId;
+  /** igual ao getOrders() em Java */
+  getOrders(): Order[] {
+    return this.props.items.map((item) => item.pk.order);
   }
 
-  get user() {
-    return this.props.user;
-  }
-
-  get locationId() {
-    return this.props.locationId;
-  }
-
-  get location() {
-    return this.props.location;
-  }
-
-  get createdAt() {
+  get createdAt(): Date {
     return this.props.createdAt;
   }
-  get updatedAt() {
+
+  get updatedAt(): Date | null {
     return this.props.updatedAt;
   }
-  get deletedAt() {
+
+  get deletedAt(): Date | null {
     return this.props.deletedAt;
   }
 
@@ -121,128 +82,135 @@ export class Property extends AggregateAbstract<PropertyProps> {
   // ✏ Mutação controlada (invariantes)
   // ----------------------
 
-  updateName(name: string) {
-    if (!name.trim()) throw new Error("Property name cannot be empty.");
-    this.props.name = name.trim();
+  updateName(name: string): void {
+    const trimmed = name.trim();
+    if (!trimmed) throw new Error("Product name cannot be empty.");
+    this.props.name = trimmed;
     this.touch();
   }
 
-  updateDescription(description: string) {
-    if (!description.trim()) throw new Error("Description cannot be empty.");
-    this.props.description = description.trim();
+  updateDescription(description: string): void {
+    const trimmed = description.trim();
+    if (!trimmed) throw new Error("Product description cannot be empty.");
+    this.props.description = trimmed;
     this.touch();
   }
 
-  updateType(type: string) {
-    if (!type.trim()) throw new Error("Type cannot be empty.");
-    this.props.type = type.trim();
+  updatePrice(price: number): void {
+    if (price < 0) throw new Error("Product price cannot be negative.");
+    this.props.price = price;
     this.touch();
   }
 
-  updateUserId(userId: UUIDVO) {
-    if (!userId.isValid()) throw new Error("UserI cannot be empty.");
-    this.props.userId = userId;
+  // ----------------------
+  // 📦 Manipulação de Images
+  // ----------------------
+
+  addImage(image: Image): void {
+    if (!this.props.images.some((i) => i.equals(image))) {
+      this.props.images.push(image);
+      this.touch();
+    }
+  }
+
+  removeImage(image: Image): void {
+    this.props.images = this.props.images.filter((i) => !i.equals(image));
     this.touch();
   }
 
-  updateLocationId(locationId: UUIDVO) {
-    if (!locationId.isValid()) throw new Error("LocationId cannot be empty.");
-    this.props.locationId = locationId;
+  // ----------------------
+  // 🏷 Manipulação de Categories
+  // ----------------------
+
+  addCategory(category: Category): void {
+    if (!this.props.categories.some((c) => c.equals(category))) {
+      this.props.categories.push(category);
+      this.touch();
+    }
+  }
+
+  removeCategory(category: Category): void {
+    this.props.categories = this.props.categories.filter(
+      (c) => !c.equals(category)
+    );
     this.touch();
   }
 
-  updateRateId(rateId: UUIDVO) {
-    if (!rateId.isValid()) throw new Error("RateId cannot be empty.");
-    this.props.rateId = rateId;
+  // ----------------------
+  // 🧩 Manipulação de OrderItem (novo)
+  // ----------------------
+
+  /** Igual ao Set.add no JPA */
+  addItem(item: OrderItem): void {
+    if (!this.props.items.some((i) => i.equals(item))) {
+      this.props.items.push(item);
+      this.touch();
+    }
+  }
+
+  /** Igual ao Set.remove no JPA */
+  removeItem(item: OrderItem): void {
+    this.props.items = this.props.items.filter((i) => !i.equals(item));
     this.touch();
   }
 
-  updateIsFeatured(isFeatured: boolean) {
-    this.props.isFeatured = isFeatured;
-    this.touch();
-  }
+  // ----------------------
+  // 🗑 Soft Delete
+  // ----------------------
 
-  updateBeds(beds: number) {
-    if (beds < 0) throw new Error("Beds cannot be negative.");
-    this.props.beds = beds;
-    this.touch();
-  }
-
-  updateBaths(baths: number) {
-    if (baths < 0) throw new Error("Baths cannot be negative.");
-    this.props.baths = baths;
-    this.touch();
-  }
-
-  updateSquareFeet(squareFeet: number) {
-    if (squareFeet <= 0) throw new Error("Square feet must be positive.");
-    this.props.squareFeet = squareFeet;
-    this.touch();
-  }
-
-  updateImages(images: Image[]) {
-    // poderíamos validar duplicados aqui
-    this.props.images = [...images];
-    this.touch();
-  }
-
-  // updateAmenities(amenities: PropertyAmenity[]) {
-  //   // validação estratégica: garantir que são entidades válidas
-  //   amenities.forEach((a) => {
-  //     if (!(a instanceof PropertyAmenity)) {
-  //       throw new Error("Amenities must be instances of PropertyAmenity.");
-  //     }
-  //   });
-
-  //   this.props.amenities = [...amenities];
-  //   this.touch();
-  // }
-  updateAmenities(amenities: PropertyAmenityList) {
-    this.props.amenities = amenities;
-    this.touch();
-  }
-
-  softDelete() {
+  softDelete(): void {
+    if (this.props.deletedAt) return; // idempotente
     this.props.deletedAt = new Date();
     this.touch();
   }
 
-  /** Atualiza o campo updatedAt e preserva consistência */
-  private touch() {
+  private touch(): void {
     this.props.updatedAt = new Date();
   }
 
   // ----------------------
-  // 🏗 Factory Method
+  // 🏗 Factory Method (criação segura)
   // ----------------------
 
-  /**
-   * Criação segura da entidade.
-   * Nunca recebe DTO direto do ORM sem mapper.
-   */
   static create(
     props: Optional<
-      PropertyProps,
-      | "createdAt"
+      ProductProps,
+      | "items"
       | "images"
-      | "amenities"
-      | "user"
-      | "rate"
-      | "location"
+      | "categories"
+      | "createdAt"
       | "deletedAt"
       | "updatedAt"
     >,
     id?: UUIDVO
-  ) {
-    return new Property(
+  ): Product {
+    const now = new Date();
+
+    if (!props.name?.trim()) {
+      throw new Error("Product.name is required.");
+    }
+
+    if (!props.description?.trim()) {
+      throw new Error("Product.description is required.");
+    }
+
+    if (props.price == null || props.price < 0) {
+      throw new Error("Product.price must be a non-negative number.");
+    }
+
+    return new Product(
       {
         ...props,
+
+        name: props.name.trim(),
+        description: props.description.trim(),
+        price: props.price,
+
         images: props.images ?? [],
-        amenities: props.amenities ?? new PropertyAmenityList(),
-        user: props.user ?? null,
-        rate: props.rate ?? null,
-        location: props.location ?? null,
-        createdAt: props.createdAt ?? new Date(),
+        categories: props.categories ?? [],
+        items: props.items ?? [], // <-- equivalente ao Set<OrderItem>
+
+        createdAt: props.createdAt ?? now,
         updatedAt: props.updatedAt ?? null,
         deletedAt: props.deletedAt ?? null,
       },
@@ -250,3 +218,23 @@ export class Property extends AggregateAbstract<PropertyProps> {
     );
   }
 }
+
+/*
+const product = Product.create({
+  name: "Mouse Gamer",
+  description: "Mouse RGB 7200dpi",
+  price: 149.9,
+});
+
+product.updatePrice(199.9);
+
+product.addCategory(category);
+product.addImage(image);
+
+product.removeCategory(oldCategory);
+product.softDelete();
+
+product.addItem(orderItem);
+const orders = product.getOrders(); // [Order, Order, ...]
+
+*/

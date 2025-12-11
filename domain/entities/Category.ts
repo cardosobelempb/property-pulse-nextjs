@@ -1,248 +1,149 @@
 import { AggregateAbstract, Optional, UUIDVO } from "@/shared";
 import { Image } from "./Image";
-import { PropertyAmenity } from "./PropertyAmenity";
-import { Rate } from "./Rate";
-import { Location } from "./Location";
-import { User } from "./User";
-import { PropertyAmenityList } from "./PropertyAmenityList";
+import { Product } from "./Product";
 
 /**
- * Tipagem oficial da entidade Property no domínio.
- * Esta tipagem representa o estado REAL da entidade, nunca um DTO externo.
+ * Estado real da entidade Category no domínio.
+ * Regras:
+ * - Nunca expõe DTO externo.
+ * - Datas e coleções sempre normalizadas.
+ * - Imutabilidade controlada via invariantes.
  */
-export type PropertyProps = {
+export type CategoryProps = {
   name: string;
-  type: string;
-  description: string;
-  beds: number;
-  baths: number;
-  squareFeet: number;
-  amenities: PropertyAmenityList;
-  images: Image[];
-  rateId: UUIDVO;
-  rate: Rate | null;
-  isFeatured: boolean;
-  locationId: UUIDVO;
-  location: Location | null;
-  userId: UUIDVO;
-  user: User | null;
+  description: string | null;
+  image: Image | null;
+  products: Product[];
+
   createdAt: Date;
   updatedAt: Date | null;
   deletedAt: Date | null;
 };
 
 /**
- * Entidade de domínio Property
- *
- * Regras importantes:
- *  - Nunca aceitar DTO cru do ORM.
- *  - Collection interna deve ser sempre entidade válida.
- *  - Mutação deve passar por invariantes.
- *  - O agregado é responsável pela coerência interna.
+ * Aggregate Root Category:
+ * - Controla coerência da lista de produtos
+ * - Gerencia soft delete
+ * - Aplica invariantes
  */
-export class Property extends AggregateAbstract<PropertyProps> {
+export class Category extends AggregateAbstract<CategoryProps> {
   // ----------------------
   // 🌱 Getters públicos
   // ----------------------
 
-  get name() {
+  get name(): string {
     return this.props.name;
   }
-  get type() {
-    return this.props.type;
-  }
-  get description() {
+
+  get description(): string | null {
     return this.props.description;
   }
-  get beds() {
-    return this.props.beds;
-  }
-  get baths() {
-    return this.props.baths;
-  }
-  get squareFeet() {
-    return this.props.squareFeet;
+
+  get image(): Image | null {
+    return this.props.image;
   }
 
-  /**
-   * Importante: retorno uma cópia superficial
-   * para evitar mutação externa inadvertida.
-   */
-  // get amenities() {
-  //   return [...this.props.amenities];
-  // }
-
-  get amenities() {
-    return this.props.amenities;
+  /** Expor cópia defensiva evita mutação externa acidental */
+  get products(): Product[] {
+    return [...this.props.products];
   }
 
-  get images() {
-    return [...this.props.images];
-  }
-
-  get isFeatured() {
-    return this.props.isFeatured;
-  }
-  get rateId() {
-    return this.props.rateId;
-  }
-
-  get rate() {
-    return this.props.rate;
-  }
-
-  get userId() {
-    return this.props.userId;
-  }
-
-  get user() {
-    return this.props.user;
-  }
-
-  get locationId() {
-    return this.props.locationId;
-  }
-
-  get location() {
-    return this.props.location;
-  }
-
-  get createdAt() {
+  get createdAt(): Date {
     return this.props.createdAt;
   }
-  get updatedAt() {
+
+  get updatedAt(): Date | null {
     return this.props.updatedAt;
   }
-  get deletedAt() {
+
+  get deletedAt(): Date | null {
     return this.props.deletedAt;
   }
 
   // ----------------------
-  // ✏ Mutação controlada (invariantes)
+  // ✏ Mutação controlada (invariantes do agregado)
   // ----------------------
 
   updateName(name: string) {
-    if (!name.trim()) throw new Error("Property name cannot be empty.");
-    this.props.name = name.trim();
+    const trimmed = name.trim();
+    if (!trimmed) throw new Error("Category.name cannot be empty.");
+
+    this.props.name = trimmed;
     this.touch();
   }
 
-  updateDescription(description: string) {
-    if (!description.trim()) throw new Error("Description cannot be empty.");
-    this.props.description = description.trim();
+  updateDescription(description: string | null) {
+    if (description !== null && !description.trim()) {
+      throw new Error("Category.description cannot be empty.");
+    }
+
+    this.props.description = description ? description.trim() : null;
     this.touch();
   }
 
-  updateType(type: string) {
-    if (!type.trim()) throw new Error("Type cannot be empty.");
-    this.props.type = type.trim();
+  updateImage(image: Image | null) {
+    this.props.image = image;
     this.touch();
   }
 
-  updateUserId(userId: UUIDVO) {
-    if (!userId.isValid()) throw new Error("UserI cannot be empty.");
-    this.props.userId = userId;
+  /**
+   * Controle explícito sobre associação com produtos.
+   * Evita inconsistência e garante integridade do agregado.
+   */
+  addProduct(product: Product) {
+    const alreadyExists = this.props.products.some((p) => p.equals(product));
+    if (alreadyExists) return;
+
+    this.props.products.push(product);
     this.touch();
   }
 
-  updateLocationId(locationId: UUIDVO) {
-    if (!locationId.isValid()) throw new Error("LocationId cannot be empty.");
-    this.props.locationId = locationId;
+  removeProduct(product: Product) {
+    this.props.products = this.props.products.filter((p) => !p.equals(product));
     this.touch();
   }
 
-  updateRateId(rateId: UUIDVO) {
-    if (!rateId.isValid()) throw new Error("RateId cannot be empty.");
-    this.props.rateId = rateId;
-    this.touch();
-  }
-
-  updateIsFeatured(isFeatured: boolean) {
-    this.props.isFeatured = isFeatured;
-    this.touch();
-  }
-
-  updateBeds(beds: number) {
-    if (beds < 0) throw new Error("Beds cannot be negative.");
-    this.props.beds = beds;
-    this.touch();
-  }
-
-  updateBaths(baths: number) {
-    if (baths < 0) throw new Error("Baths cannot be negative.");
-    this.props.baths = baths;
-    this.touch();
-  }
-
-  updateSquareFeet(squareFeet: number) {
-    if (squareFeet <= 0) throw new Error("Square feet must be positive.");
-    this.props.squareFeet = squareFeet;
-    this.touch();
-  }
-
-  updateImages(images: Image[]) {
-    // poderíamos validar duplicados aqui
-    this.props.images = [...images];
-    this.touch();
-  }
-
-  // updateAmenities(amenities: PropertyAmenity[]) {
-  //   // validação estratégica: garantir que são entidades válidas
-  //   amenities.forEach((a) => {
-  //     if (!(a instanceof PropertyAmenity)) {
-  //       throw new Error("Amenities must be instances of PropertyAmenity.");
-  //     }
-  //   });
-
-  //   this.props.amenities = [...amenities];
-  //   this.touch();
-  // }
-  updateAmenities(amenities: PropertyAmenityList) {
-    this.props.amenities = amenities;
-    this.touch();
-  }
-
+  /** Soft delete mantendo histórico */
   softDelete() {
+    if (this.props.deletedAt) return; // idempotente
+
     this.props.deletedAt = new Date();
     this.touch();
   }
 
-  /** Atualiza o campo updatedAt e preserva consistência */
+  /** Atualiza updatedAt garantindo consistência temporal */
   private touch() {
     this.props.updatedAt = new Date();
   }
 
   // ----------------------
-  // 🏗 Factory Method
+  // 🏗 Factory
   // ----------------------
 
-  /**
-   * Criação segura da entidade.
-   * Nunca recebe DTO direto do ORM sem mapper.
-   */
   static create(
     props: Optional<
-      PropertyProps,
+      CategoryProps,
       | "createdAt"
-      | "images"
-      | "amenities"
-      | "user"
-      | "rate"
-      | "location"
+      | "image"
+      | "description"
       | "deletedAt"
       | "updatedAt"
+      | "products"
     >,
     id?: UUIDVO
-  ) {
-    return new Property(
+  ): Category {
+    const now = new Date();
+
+    // Normalização defensiva
+    return new Category(
       {
         ...props,
-        images: props.images ?? [],
-        amenities: props.amenities ?? new PropertyAmenityList(),
-        user: props.user ?? null,
-        rate: props.rate ?? null,
-        location: props.location ?? null,
-        createdAt: props.createdAt ?? new Date(),
+        name: props.name.trim(),
+        description: props.description?.trim() || null,
+        image: props.image ?? null,
+        products: props.products ?? [],
+
+        createdAt: props.createdAt ?? now,
         updatedAt: props.updatedAt ?? null,
         deletedAt: props.deletedAt ?? null,
       },
@@ -250,3 +151,18 @@ export class Property extends AggregateAbstract<PropertyProps> {
     );
   }
 }
+
+/**
+const category = Category.create({
+  name: "Teclados",
+  description: "Produtos da linha mecânica"
+});
+
+const product = Product.create({ name: "Keychron K6" });
+
+category.addProduct(product);
+category.updateName("Teclados Mecânicos");
+category.updateDescription("Linha premium de teclados");
+category.updateImage(Image.create(...));
+category.softDelete();
+*/
