@@ -63,7 +63,7 @@ export class Product extends AggregateAbstract<ProductProps> {
 
   /** igual ao getOrders() em Java */
   getOrders(): Order[] {
-    return this.props.items.map((item) => item.pk.order);
+    return this.props.items.map((item) => item.props.pk.order);
   }
 
   get createdAt(): Date {

@@ -1,5 +1,5 @@
 // ======================================================
-// 🔧 Configurações principais do Prisma
+// 🔧 Configurações do Prisma
 // ======================================================
 generator client {
   provider = "prisma-client-js"
@@ -12,8 +12,7 @@ datasource db {
 }
 
 // ======================================================
-// 🧑‍💼 User — Usuários da aplicação (1:N com Property)
-// 🧑‍💼 Order — Usuários da aplicação (1:N com Order)
+// 📌 ENUMS
 // ======================================================
 enum Roles {
   ADMIN
@@ -21,10 +20,20 @@ enum Roles {
   SUPPLIER
 }
 
+enum OrderStatus {
+  WAITING_PAYMENT
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELED
+}
+
+// ======================================================
+// 🧑‍💼 User — Usuários
+// ======================================================
 model User {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  // Dados pessoais
   firstName String    @map("first_name")
   lastName  String    @map("last_name")
   email     String    @unique
@@ -33,14 +42,11 @@ model User {
   birthDate DateTime? @map("birth_date")
   image     String?
 
-  // Regra de acesso
-  role Int @default(1)
+  role Roles @default(CLIENT)
 
-  // Relacionamentos
   properties Property[]
   orders     Order[]
 
-  // Auditoria
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
@@ -49,7 +55,7 @@ model User {
 }
 
 // ======================================================
-// 📍 Location — Dados de endereço (1:N com Property)
+// 📍 Location — Endereços
 // ======================================================
 model Location {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -59,10 +65,8 @@ model Location {
   state   String
   zipcode String
 
-  // Relacionamentos
   properties Property[]
 
-  // Auditoria
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
@@ -71,7 +75,7 @@ model Location {
 }
 
 // ======================================================
-// 💰 Rate — Tarifas (1:N com Property)
+// 💰 Rate — Tarifas
 // ======================================================
 model Rate {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -90,14 +94,13 @@ model Rate {
 }
 
 // ======================================================
-// 🧺 Amenity — Amenidades (N:N via PropertyAmenity)
+// 🧺 Amenity — Amenidades
 // ======================================================
 model Amenity {
   id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name String @unique
 
-  // Relacionamento N:N
-  propertyAmenities PropertyAmenity[]
+  amenities PropertyAmenity[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -107,13 +110,13 @@ model Amenity {
 }
 
 // ======================================================
-// 🔗 Tabela de junção N:N explícita
+// 🔗 PropertyAmenity — Pivot N:N
 // ======================================================
 model PropertyAmenity {
-  propertyId String   @map("property_id") @db.Uuid
+  propertyId String   @db.Uuid
   property   Property @relation(fields: [propertyId], references: [id])
 
-  amenityId String  @map("amenity_id") @db.Uuid
+  amenityId String  @db.Uuid
   amenity   Amenity @relation(fields: [amenityId], references: [id])
 
   @@id([propertyId, amenityId])
@@ -121,53 +124,32 @@ model PropertyAmenity {
 }
 
 // ======================================================
-// 🖼️ Image — Imagens de um imóvel (1:N)
-// ======================================================
-model Image {
-  id  String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  url String @db.Text
-
-  propertyId String   @map("property_id") @db.Uuid
-  property   Property @relation(fields: [propertyId], references: [id])
-
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  @@map("image")
-}
-
-// ======================================================
-// 🏡 Property — Imóvel (relaciona tudo)
+// 🏡 Property — Imóvel
 // ======================================================
 model Property {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  // Dados gerais
   name        String
   type        String
   description String
 
-  // Características físicas
   beds       Int
   baths      Int
   squareFeet Int     @map("square_feet")
   isFeatured Boolean @default(false) @map("is_featured")
 
-  // Relacionamentos
-  rateId String @map("rate_id") @db.Uuid
+  rateId String @db.Uuid
   rate   Rate   @relation(fields: [rateId], references: [id])
 
-  locationId String   @map("location_id") @db.Uuid
+  locationId String   @db.Uuid
   location   Location @relation(fields: [locationId], references: [id])
 
-  userId String @map("user_id") @db.Uuid
+  userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id])
 
-  images    Image[]
   amenities PropertyAmenity[]
+  images    ImageProperty[]
 
-  // Auditoria
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
@@ -175,84 +157,144 @@ model Property {
   @@map("property")
 }
 
+// ======================================================
+// 🔗 Pivot — Property ↔ Image
+// ======================================================
+model ImageProperty {
+  propertyId String   @db.Uuid
+  property   Property @relation(fields: [propertyId], references: [id])
+
+  imageId String @db.Uuid
+  image   Image  @relation(fields: [imageId], references: [id])
+
+  @@id([propertyId, imageId])
+  @@map("property_image")
+}
+
+// ======================================================
+// 🛒 Product — Produtos
+// ======================================================
 model Product {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
   name        String
   description String
   price       Float?
-  image       String @map("image")
 
-  createdAt  DateTime          @default(now()) @map("created_at")
-  updatedAt  DateTime?         @updatedAt @map("updated_at")
-  deletedAt  DateTime?         @map("deleted_at")
   orderItems OrderItem[]
   categories ProductCategory[]
-  categoryId String?           @db.Uuid
+
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime?      @updatedAt @map("updated_at")
+  deletedAt DateTime?      @map("deleted_at")
+  images    ImageProduct[]
 
   @@map("product")
 }
 
+// ======================================================
+// 🔗 Pivot — Product ↔ Image
+// ======================================================
+model Image {
+  id  String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  url String @db.Text
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime?       @updatedAt @map("updated_at")
+  deletedAt       DateTime?       @map("deleted_at")
+  products        ImageProduct[]
+  imageCategories CategoryImage[]
+  imageProperties ImageProperty[]
+
+  // Nome único da tabela
+  @@map("image")
+}
+
+model ImageProduct {
+  productId String  @db.Uuid
+  product   Product @relation(fields: [productId], references: [id])
+
+  imageId String @db.Uuid
+  image   Image  @relation(fields: [imageId], references: [id])
+
+  @@id([productId, imageId])
+  @@map("product_image")
+}
+
+// ======================================================
+// 🏷️ Category
+// ======================================================
 model Category {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
-  description String
-  image       String            @map("image")
-  products    ProductCategory[]
+  description String?
 
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+  // Relação 1:1 → Uma categoria tem 1 imagem
+
+  products ProductCategory[]
+
+  createdAt DateTime        @default(now()) @map("created_at")
+  updatedAt DateTime?       @updatedAt @map("updated_at")
+  deletedAt DateTime?       @map("deleted_at")
+  images    CategoryImage[]
 
   @@map("category")
 }
 
-model ProductCategory {
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+model CategoryImage {
+  categoryId String   @db.Uuid
+  category   Category @relation(fields: [categoryId], references: [id])
 
-  productId String  @map("product_id") @db.Uuid
+  imageId String @db.Uuid
+  image   Image  @relation(fields: [imageId], references: [id])
+
+  @@id([categoryId, imageId])
+  @@map("category_image")
+}
+
+// ======================================================
+// 🔗 Pivot — Category ↔ Product
+// ======================================================
+model ProductCategory {
+  productId String  @db.Uuid
   product   Product @relation(fields: [productId], references: [id])
 
-  categoryId String   @map("category_id") @db.Uuid
-  amenity    Category @relation(fields: [categoryId], references: [id])
+  categoryId String   @db.Uuid
+  category   Category @relation(fields: [categoryId], references: [id])
 
   @@id([productId, categoryId])
   @@map("product_category")
 }
 
-enum OrderStatus {
-  WAITING_PAYMENT
-  PAID
-  SHIPPED
-  DELIVERED
-  CANCELED
-}
-
+// ======================================================
+// 🧾 Order — Pedido
+// ======================================================
 model Order {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
   status  OrderStatus @default(WAITING_PAYMENT)
   payment Payment?
 
-  clientId String @unique @map("client_id") @db.Uuid
+  clientId String @map("client_id") @db.Uuid
   client   User   @relation(fields: [clientId], references: [id])
 
-  createdAt  DateTime    @default(now()) @map("created_at")
-  updatedAt  DateTime?   @updatedAt @map("updated_at")
-  deletedAt  DateTime?   @map("deleted_at")
   orderItems OrderItem[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("order")
 }
 
+// ======================================================
+// 💳 Payment — Pagamento
+// ======================================================
 model Payment {
   id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   status String
 
-  orderId String @unique @map("order_id") @db.Uuid
+  orderId String @unique @db.Uuid
   order   Order  @relation(fields: [orderId], references: [id])
 
   createdAt DateTime  @default(now()) @map("created_at")
@@ -262,19 +304,22 @@ model Payment {
   @@map("payment")
 }
 
+// ======================================================
+// 📦 OrderItem — Item de pedido
+// ======================================================
 model OrderItem {
   quantity Int
   price    Float
 
+  productId String  @db.Uuid
+  product   Product @relation(fields: [productId], references: [id])
+
+  orderId String @db.Uuid
+  order   Order  @relation(fields: [orderId], references: [id])
+
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
-
-  productId String  @map("product_id") @db.Uuid
-  product   Product @relation(fields: [productId], references: [id])
-
-  orderId String @map("order_id") @db.Uuid
-  amenity Order  @relation(fields: [orderId], references: [id])
 
   @@id([productId, orderId])
   @@map("order_item")

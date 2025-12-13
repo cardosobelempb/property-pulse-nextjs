@@ -11,7 +11,7 @@ INSERT INTO
         email,
         password,
         phone,
-        role,
+        role
     )
 VALUES (
         'John',
@@ -19,7 +19,7 @@ VALUES (
         'john@gmail.com',
         'hashed_password_1',
         '617-555-5555',
-        1,
+        1
     ),
     (
         'David',
@@ -27,7 +27,7 @@ VALUES (
         'david@gmail.com',
         'hashed_password_2',
         '213-555-5555',
-        1,
+        1
     ),
     (
         'Michael',
@@ -35,7 +35,7 @@ VALUES (
         'michael@gmail.com',
         'hashed_password_3',
         '312-555-5555',
-        1,
+        1
     ),
     (
         'Robert',
@@ -43,7 +43,7 @@ VALUES (
         'robert@gmail.com',
         'hashed_password_4',
         '303-555-5555',
-        1,
+        1
     ),
     (
         'Jennifer',
@@ -51,7 +51,7 @@ VALUES (
         'jennifer@gmail.com',
         'hashed_password_5',
         '970-555-5555',
-        1,
+        1
     ),
     (
         'Lisa',
@@ -59,7 +59,7 @@ VALUES (
         'lisa@gmail.com',
         'hashed_password_6',
         '303-555-5555',
-        1,
+        1
     ),
     (
         'Matthew',
@@ -67,7 +67,7 @@ VALUES (
         'matthew@gmail.com',
         'hashed_password_7',
         '215-555-5555',
-        1,
+        1
     );
 
 -- 2️⃣ LOCATIONS

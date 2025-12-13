@@ -49,7 +49,7 @@ export class Order extends Entity<OrderProps> {
 
   /** Igual ao método JPA getProducts() */
   getProducts(): Product[] {
-    return this.props.items.map((item) => item.pk.product);
+    return this.props.items.map((item) => item.props.pk.product);
   }
 
   get createdAt() {

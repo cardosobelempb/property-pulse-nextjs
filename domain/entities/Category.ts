@@ -12,7 +12,7 @@ import { Product } from "./Product";
 export type CategoryProps = {
   name: string;
   description: string | null;
-  image: Image | null;
+  images: Image[];
   products: Product[];
 
   createdAt: Date;
@@ -39,8 +39,8 @@ export class Category extends AggregateAbstract<CategoryProps> {
     return this.props.description;
   }
 
-  get image(): Image | null {
-    return this.props.image;
+  get image(): Image[] {
+    return this.props.images;
   }
 
   /** Expor cópia defensiva evita mutação externa acidental */
@@ -81,8 +81,8 @@ export class Category extends AggregateAbstract<CategoryProps> {
     this.touch();
   }
 
-  updateImage(image: Image | null) {
-    this.props.image = image;
+  updateImage(images: Image[]) {
+    this.props.images = images;
     this.touch();
   }
 
@@ -124,7 +124,7 @@ export class Category extends AggregateAbstract<CategoryProps> {
     props: Optional<
       CategoryProps,
       | "createdAt"
-      | "image"
+      | "images"
       | "description"
       | "deletedAt"
       | "updatedAt"
@@ -140,7 +140,7 @@ export class Category extends AggregateAbstract<CategoryProps> {
         ...props,
         name: props.name.trim(),
         description: props.description?.trim() || null,
-        image: props.image ?? null,
+        images: props.images ?? [],
         products: props.products ?? [],
 
         createdAt: props.createdAt ?? now,
