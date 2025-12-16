@@ -1,9 +1,5 @@
-import { User } from "@/domain/entities/User";
-import { UserRepository } from "../UserRepository";
-
-import { IPagination, prisma } from "@/shared";
-import { UserMapper } from "@/domain/application/repositories/mappers/UserMapper";
 import { Category } from "@/domain/entities/Category";
+import { IPagination, prisma } from "@/shared";
 import { CategoryRepository } from "../CategoryRepository";
 import { CategoryMapper } from "../mappers/CategoryMapper";
 
@@ -17,12 +13,17 @@ export class CategoryPrismaRepository implements CategoryRepository {
     return CategoryMapper.toDomain(category);
   }
 
-  async findAll({ page }: IPagination): Promise<Category[]> {
+  async findAll({
+    page,
+    size = 20,
+    direction,
+    sort,
+  }: IPagination): Promise<Category[]> {
     const categorys = await prisma.category.findMany({
-      take: 20,
-      skip: (page - 1) * 20,
+      take: size,
+      skip: (page - 1) * size,
       orderBy: {
-        createdAt: "desc",
+        createdAt: direction,
       },
     });
 
@@ -34,21 +35,45 @@ export class CategoryPrismaRepository implements CategoryRepository {
     await prisma.category.create({ data });
   }
 
+  async insert(entity: Category): Promise<Category> {
+    const data = CategoryMapper.toPersistence(entity);
+    const category = await prisma.category.create({ data });
+    return CategoryMapper.toDomain(category);
+  }
+
   async update(entity: Category): Promise<void> {
     const data = CategoryMapper.toPersistence(entity);
     await prisma.category.update({
-      where: {
-        id: data.id,
-      },
       data,
+      where: {
+        id: entity.id.getValue(),
+      },
+    });
+  }
+
+  async edit(id: string, entity: Category): Promise<Category> {
+    const data = CategoryMapper.toPersistence(entity);
+    const category = await prisma.category.update({
+      data,
+      where: {
+        id,
+      },
+    });
+    return CategoryMapper.toDomain(category);
+  }
+
+  async destroy(id: string, entity: Category): Promise<void> {
+    await prisma.category.delete({
+      where: {
+        id,
+      },
     });
   }
 
   async delete(entity: Category): Promise<void> {
-    const data = CategoryMapper.toPersistence(entity);
     await prisma.category.delete({
       where: {
-        id: data.id,
+        id: entity.id.getValue(),
       },
     });
   }

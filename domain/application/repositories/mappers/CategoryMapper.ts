@@ -9,8 +9,9 @@ export class CategoryMapper {
     return Category.create(
       {
         name: raw.name,
+        description: raw.description,
       },
-      new UUIDVO(raw.id)
+      UUIDVO.create(raw.id)
     );
   }
 
@@ -18,6 +19,7 @@ export class CategoryMapper {
     return {
       id: entity.id.getValue(),
       name: entity.name,
+      description: entity.description,
     };
   }
 }

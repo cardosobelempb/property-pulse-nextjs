@@ -1,4 +1,5 @@
 import { Category } from "@/domain/entities/Category";
+import { Image } from "@/domain/entities/Image";
 
 /**
  * DTO de saída para a API HTTP.
@@ -10,9 +11,11 @@ import { Category } from "@/domain/entities/Category";
 export namespace CategoryHttp {
   export interface Input {}
   export interface Output {
+    id: string;
     name: string;
     description: string | null;
     createdAt: string;
+    image: Image[];
   }
 }
 
@@ -30,9 +33,11 @@ export class CategoryPresenter {
    */
   static toHTTP(entity: Category): CategoryHttp.Output {
     return {
+      id: entity.id.getValue(),
       name: entity.name,
       description: entity.description,
       createdAt: entity.createdAt.toISOString(),
+      image: entity.image,
     };
   }
 

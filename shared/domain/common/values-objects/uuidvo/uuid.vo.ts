@@ -1,45 +1,67 @@
-import { BadRequestError } from '../../errors'
+import { BadRequestError } from "../../errors";
+import { AbstractValueObject } from "../AbstractValueObject";
 
-export class UUIDVO {
-  private readonly value: string
+/**
+ * 🎯 Responsabilidade única:
+ * Representar e validar um UUID v4 imutável
+ */
+export class UUIDVO extends AbstractValueObject<string> {
+  private static readonly UUIDV4_REGEX =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-  constructor(uuid?: string) {
-    const cleanUUID = uuid?.replace(/^urn:uuid:/i, '') ?? UUIDVO.generate()
+  /**
+   * 🔨 Fábrica estática para criar instâncias validadas.
+   * @param uuid - UUIDv4 válido ou undefined (gera automaticamente)
+   * @throws BadRequestError se o UUID for inválido
+   */
+  public static create(uuid?: string): UUIDVO {
+    const normalizedUUID = UUIDVO.normalize(uuid) ?? UUIDVO.generate();
 
-    if (!UUIDVO.isValid(cleanUUID)) {
-      throw new BadRequestError(`Invalid UUIDv4 format: "${cleanUUID}"`)
+    if (!UUIDVO.isValid(normalizedUUID)) {
+      throw new BadRequestError(`Invalid UUIDv4 format: "${normalizedUUID}"`);
     }
 
-    this.value = cleanUUID
+    return new UUIDVO(normalizedUUID);
   }
 
-  // Retorna o valor encapsulado
-  public getValue(): string {
-    return this.value
+  /** 🔒 Construtor privado: força uso do método create */
+  private constructor(uuid: string) {
+    super(uuid); // delega para a classe base a imutabilidade
   }
 
-  public equals(id: UUIDVO) {
-    return id.getValue() === this.value
-  }
-
-  // Verifica se o UUID atual é válido (útil em cenários mais flexíveis)
+  /** 🧪 Implementação do contrato de validação */
   public isValid(): boolean {
-    return UUIDVO.isValid(this.value)
+    return UUIDVO.isValid(this.value);
   }
 
-  // Gera um UUIDv4 válido
+  /**
+   * ⚙️ Gera um UUIDv4 válido (criptograficamente seguro)
+   */
   public static generate(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-      const r = (Math.random() * 16) | 0
-      const v = c === 'x' ? r : (r & 0x3) | 0x8
-      return v.toString(16)
-    })
+    if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+      return crypto.randomUUID();
+    }
+
+    // Fallback para ambientes sem crypto
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
   }
 
-  // Valida se um UUID é v4 válido
+  /** 🧩 Verifica se o formato de UUIDv4 é válido */
   public static isValid(uuid: string): boolean {
-    const regex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-    return regex.test(uuid)
+    if (!uuid) return false;
+    return UUIDVO.UUIDV4_REGEX.test(uuid.trim().toLowerCase());
+  }
+
+  /** 🧹 Normaliza o UUID removendo prefixos como 'urn:uuid:' */
+  private static normalize(uuid?: string): string | null {
+    if (!uuid) return null;
+    return uuid
+      .replace(/^urn:uuid:/i, "")
+      .trim()
+      .toLowerCase();
   }
 }

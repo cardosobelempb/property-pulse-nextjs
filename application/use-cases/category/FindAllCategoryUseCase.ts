@@ -1,5 +1,7 @@
-import { CategoryRepository } from "@/domain/application/repositories/CategoryRepository";
-import { Category } from "@/domain/entities/Category";
+import { CategoryPrismaRepository } from "@/domain/application/repositories/prisma/CategoryPrismaRepository";
+import { CategoryPresenter } from "@/infra/presenters/CategoryPresenter";
+import { IPagination } from "@/shared";
+import {} from "@/shared/domain/common/";
 
 /**
  * Namespace responsável apenas pelos contratos do Use Case
@@ -10,15 +12,13 @@ export namespace FindAllCategory {
    * DTO de entrada do caso de uso.
    * NÃO depende de HTTP, Next.js ou framework algum.
    */
-  export interface Input {
-    page: number;
-  }
+  export interface Input extends IPagination {}
 
   /**
    * DTO de saída do caso de uso.
    */
   export interface Output {
-    categories: Category[];
+    categories: CategoryPresenter[];
   }
 }
 
@@ -30,13 +30,19 @@ export namespace FindAllCategory {
  * ✔️ Focado apenas na regra de negócio
  */
 export class FindAllCategoryUseCase {
-  constructor(private readonly repository: CategoryRepository) {}
+  constructor(private readonly repository: CategoryPrismaRepository) {}
 
   async execute(input: FindAllCategory.Input): Promise<FindAllCategory.Output> {
-    const { page } = input;
+    const { page, size, direction } = input;
 
-    const categories = await this.repository.findAll({ page });
-
-    return { categories };
+    const result = await this.repository.findAll({
+      page,
+      size,
+      direction,
+    });
+    const categories = CategoryPresenter.toHTTPList(result);
+    return {
+      categories,
+    };
   }
 }

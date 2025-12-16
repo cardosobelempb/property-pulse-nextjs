@@ -77,7 +77,7 @@ export class Category extends AggregateAbstract<CategoryProps> {
       throw new Error("Category.description cannot be empty.");
     }
 
-    this.props.description = description ? description.trim() : null;
+    this.props.description = description?.trim() ?? null;
     this.touch();
   }
 
