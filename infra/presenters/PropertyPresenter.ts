@@ -1,41 +1,26 @@
 import { Property } from "@/domain/entities/Property";
-import { ImageHttpResponse, ImagePresenter } from "./ImagePresenter";
-import { LocationHttpResponse, LocationPresenter } from "./LocationPresenter";
-import { RateHttpResponse, RatePresenter } from "./RatePresenter";
-import { UserHttpResponse, UserPresenter } from "./UserPresenter";
-import {
-  PropertyAmenityHttpResponse,
-  PropertyAmenityPresenter,
-} from "./PropertyAmenityPresenter";
-import {
-  PropertyAmenityListHttpResponse,
-  PropertyAmenityListPresenter,
-} from "./PropertyAmenityListPresenter";
-import { AmenityPresenter } from "./AmenityPresenter";
+import { LocationPresenter, LocationPresenterProps } from "./LocationPresenter";
+import { LocationProps } from "@/domain/entities/Location";
 
-export interface PropertyHttpResponse {
+export interface PropertyPresenterProps {
+  id: string;
   name: string;
   type: string;
   description: string;
   beds: number;
   baths: number;
   squareFeet: number;
-  isFeatured: boolean;
-
-  rate: RateHttpResponse | null;
-  location: LocationHttpResponse | null;
-  user: UserHttpResponse | null;
-
-  images: ImageHttpResponse[];
-  amenities: PropertyAmenityListPresenter; // ← agora correto
+  isFeatured?: boolean;
+  userId: string;
+  rateId: string;
+  location: LocationPresenterProps;
   createdAt: Date;
 }
 
 export class PropertyPresenter {
-  static toHTTP(property: Property): PropertyHttpResponse {
-    // console.log("PropertyPresenter=>", property);
+  static toHTTP(property: Property): PropertyPresenterProps {
     return {
-      // id: property.id.getValue(),
+      id: property.id.toString(),
       name: property.name,
       type: property.type,
       description: property.description,
@@ -43,18 +28,18 @@ export class PropertyPresenter {
       baths: property.baths,
       squareFeet: property.squareFeet,
       isFeatured: property.isFeatured,
-
-      images: property.images.map(ImagePresenter.toHTTP),
-
-      amenities: property.amenities,
-
-      rate: property.rate ? RatePresenter.toHTTP(property.rate) : null,
-      location: property.location
-        ? LocationPresenter.toHTTP(property.location)
-        : null,
-      user: property.user ? UserPresenter.toHTTP(property.user) : null,
-
-      createdAt: property.createdAt,
+      location: LocationPresenter.toHTTP(property.location),
+      rateId: property.rateId,
+      userId: property.userId,
+      createdAt: property.createdAt ?? new Date(),
     };
+  }
+
+  /**
+   * Converte uma lista de entidades para DTOs HTTP
+   * Evita repetição de `.map()` espalhado pelo código
+   */
+  static toHTTPList(entities: Property[]): PropertyPresenterProps[] {
+    return entities.map(PropertyPresenter.toHTTP);
   }
 }

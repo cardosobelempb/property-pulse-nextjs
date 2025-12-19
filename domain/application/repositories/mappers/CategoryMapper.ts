@@ -17,7 +17,6 @@ export class CategoryMapper {
 
   static toPersistence(entity: Category): Prisma.CategoryUncheckedCreateInput {
     return {
-      id: entity.id.getValue(),
       name: entity.name,
       description: entity.description,
     };

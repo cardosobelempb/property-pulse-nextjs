@@ -3,6 +3,7 @@ import {
   makeFindCategoryByIdUseCase,
 } from "@/application/factories";
 import { NotFoundError } from "@/shared";
+import { extractId } from "@/shared/extract-id";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -16,9 +17,7 @@ export async function DELETE(
 ): Promise<NextResponse<null | { error: string }>> {
   try {
     // Extrair o ID da URL
-    const url = new URL(request.url);
-    const id = url.pathname.split("/").pop(); // Extrai o último segmento da URL, que é o ID
-    console.log("ID =>", id);
+    const id = extractId(request) as string;
 
     if (!id) {
       return NextResponse.json(
@@ -29,7 +28,6 @@ export async function DELETE(
 
     const findCategoryByIdUseCase = makeFindCategoryByIdUseCase();
     const category = await findCategoryByIdUseCase.execute(id);
-    console.log(category);
 
     if (!category) {
       return new NextResponse(

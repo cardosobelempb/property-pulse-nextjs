@@ -1,0 +1,52 @@
+{
+  "id": "1b69c6a2-56a0-4ea4-9bc1-970c56d0e911",
+  "name": "Boston Commons Retreat",
+  "type": "Apartment",
+  "description": "Beautiful 2 bedroom apartment near the commons, available weekly or monthly.",
+  "beds": 2,
+  "baths": 1,
+  "squareFeet": 1500,
+  "isFeatured": false,
+  "rateId": "1721fbda-9520-45ef-8f7e-cc03d66b4314",
+  "locationId": "cbd1f743-1ae8-4a88-901e-927300ff9be3",
+  "userId": "c5543ed6-a704-4f29-819b-7170cf61389b",
+  "createdAt": "2025-12-17T15:22:14.025Z",
+  "updatedAt": "2025-12-17T15:22:14.025Z",
+  "deletedAt": null,
+  "images": [],
+  "amenities": [],
+  "rate": {
+    "id": "1721fbda-9520-45ef-8f7e-cc03d66b4314",
+    "weekly": 1100,
+    "monthly": 4200,
+    "nightly": 0,
+    "createdAt": "2025-12-17T11:33:03.462Z",
+    "updatedAt": null,
+    "deletedAt": null
+  },
+  "location": {
+    "id": "cbd1f743-1ae8-4a88-901e-927300ff9be3",
+    "street": "120 Tremont Street",
+    "city": "Boston",
+    "state": "MA",
+    "zipcode": "02108",
+    "createdAt": "2025-12-17T11:25:15.960Z",
+    "updatedAt": null,
+    "deletedAt": null
+  },
+  "user": {
+    "id": "c5543ed6-a704-4f29-819b-7170cf61389b",
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@gmail.com",
+    "password": "hashed_password_1",
+    "phone": "617-555-5555",
+    "birthDate": "2025-12-17T11:25:15.000Z",
+    "image": null,
+    "role": "CLIENT",
+    "createdAt": "2025-12-17T11:31:48.474Z",
+    "updatedAt": null,
+    "deletedAt": null
+  }
+}
+

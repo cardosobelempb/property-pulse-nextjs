@@ -1,5 +1,5 @@
-import { makeFindCategoryByIdUseCase } from "@/application/factories";
-import { CategoryPresenter } from "@/infra/presenters/CategoryPresenter";
+import { makeFindPropertyByIdUseCase } from "@/application/factories/property";
+import { PropertyPresenter } from "@/infra/presenters/PropertyPresenter";
 import { extractId } from "@/shared/extract-id";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,7 +10,7 @@ export namespace GetIdHttp {
   }
 
   export interface OutPut {
-    category: CategoryPresenter;
+    property: PropertyPresenter;
   }
 }
 
@@ -29,20 +29,20 @@ export async function GET(
       );
     }
 
-    const findCategoryByIdUseCase = makeFindCategoryByIdUseCase();
-    const category = await findCategoryByIdUseCase.execute(id);
+    const findPropertyByIdUseCase = makeFindPropertyByIdUseCase();
+    const { property } = await findPropertyByIdUseCase.execute({ id });
 
-    if (!category) {
+    if (!property) {
       return new NextResponse(
-        JSON.stringify({ error: "Categoria não encontrada." }),
+        JSON.stringify({ error: "Property não encontrada." }),
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ category: CategoryPresenter.toHTTP(category) });
+    return NextResponse.json({ property: PropertyPresenter.toHTTP(property) });
   } catch (error) {
     return new NextResponse(
-      JSON.stringify({ error: "Erro ao buscar a categoria." }),
+      JSON.stringify({ error: "Erro ao buscar a property." }),
       { status: 500 }
     );
   }

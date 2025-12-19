@@ -12,7 +12,7 @@ export class RateMapper {
         monthly: raw.monthly ?? 0,
         weekly: raw.weekly ?? 0,
       },
-      new UUIDVO(raw.id)
+      UUIDVO.create(raw.id)
     );
   }
 

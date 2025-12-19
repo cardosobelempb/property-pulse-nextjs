@@ -5,12 +5,12 @@ export class DeleteCategoryUseCase {
   constructor(private readonly categoryRepository: CategoryPrismaRepository) {}
 
   async execute(categoryId: string): Promise<void> {
-    const data = await this.categoryRepository.findById(categoryId);
+    const entity = await this.categoryRepository.findById(categoryId);
 
-    if (!data) {
+    if (!entity) {
       throw new NotFoundError(categoryId);
     }
 
-    await this.categoryRepository.delete(data);
+    await this.categoryRepository.delete(entity);
   }
 }

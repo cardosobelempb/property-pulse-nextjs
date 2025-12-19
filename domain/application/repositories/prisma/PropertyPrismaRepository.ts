@@ -23,6 +23,7 @@ export class PropertyPrismaRepository implements PropertyRepository {
       include: this.buildIncludes(),
     });
 
+    // console.log("Property =>", property);
     return property ? PropertyMapper.toDomain(property) : null;
   }
 
@@ -38,10 +39,20 @@ export class PropertyPrismaRepository implements PropertyRepository {
   }
 
   async create(entity: Property): Promise<void> {
+    const data = PropertyMapper.toPersistence(entity);
     await prisma.property.create({
-      data: PropertyMapper.toPersistence(entity),
-      include: { images: true, amenities: true },
+      data,
     });
+  }
+
+  async insert(entity: Property): Promise<Property> {
+    const data = PropertyMapper.toPersistence(entity);
+    const property = await prisma.property.create({
+      data,
+      include: { location: true },
+    });
+
+    return PropertyMapper.toDomain(property);
   }
 
   async update(entity: Property): Promise<void> {
@@ -56,6 +67,10 @@ export class PropertyPrismaRepository implements PropertyRepository {
     });
   }
 
+  async edit(id: string, entity: Property): Promise<Property> {
+    throw new Error("Method not implemented.");
+  }
+
   async delete(entity: Property): Promise<void> {
     if (!entity.id) {
       throw new NotFoundError("Property inválida: ID ausente para delete.");
@@ -64,6 +79,10 @@ export class PropertyPrismaRepository implements PropertyRepository {
     await prisma.property.delete({
       where: { id: entity.id.getValue() },
     });
+  }
+
+  async destroy(id: string, entity: Property): Promise<void> {
+    throw new Error("Method not implemented.");
   }
 
   private buildIncludes() {

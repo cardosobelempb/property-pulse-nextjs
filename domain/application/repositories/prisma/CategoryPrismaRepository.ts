@@ -13,21 +13,15 @@ export class CategoryPrismaRepository implements CategoryRepository {
     return CategoryMapper.toDomain(category);
   }
 
-  async findAll({
-    page,
-    size = 20,
-    direction,
-    sort,
-  }: IPagination): Promise<Category[]> {
-    const categorys = await prisma.category.findMany({
+  async findAll({ page, size = 20 }: IPagination): Promise<Category[]> {
+    const categorias = await prisma.property.findMany({
       take: size,
       skip: (page - 1) * size,
-      orderBy: {
-        createdAt: direction,
-      },
+      orderBy: { createdAt: "desc" },
+      include: this.buildIncludes(),
     });
 
-    return categorys.map(CategoryMapper.toDomain);
+    return categorias.map(CategoryMapper.toDomain);
   }
 
   async create(entity: Category): Promise<void> {
@@ -76,5 +70,9 @@ export class CategoryPrismaRepository implements CategoryRepository {
         id: entity.id.getValue(),
       },
     });
+  }
+
+  private buildIncludes() {
+    return {};
   }
 }

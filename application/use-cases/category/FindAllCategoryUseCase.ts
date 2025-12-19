@@ -13,6 +13,7 @@ export namespace FindAllCategory {
    * NÃO depende de HTTP, Next.js ou framework algum.
    */
   export interface Input extends IPagination {}
+  // export interface Input extends NextRequest {}
 
   /**
    * DTO de saída do caso de uso.
@@ -44,5 +45,10 @@ export class FindAllCategoryUseCase {
     return {
       categories,
     };
+
+    // const pageParam = input.nextUrl.searchParams.get("page");
+    // const page = pageParam ? Number(pageParam) : 1;
+    // const categories = await this.repository.findAll({ page });
+    // return { categories };
   }
 }

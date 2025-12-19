@@ -1,6 +1,7 @@
 import { Entity, Optional, UUIDVO } from "@/shared";
 
 export interface AmenityProps {
+  id?: UUIDVO;
   name: string;
   createdAt: Date;
   updatedAt?: Date | null;

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { makeUpdateCategoryUseCase } from "@/application/factories";
 import { CategoryPresenter } from "@/infra/presenters/CategoryPresenter";
+import { extractId } from "@/shared/extract-id";
+import { NotFoundError } from "@/shared";
 
 /**
  * DTO responsável apenas pelos dados necessários
@@ -18,45 +20,34 @@ export namespace PutHttp {
 }
 
 /**
- * Extrai o ID da URL de forma segura.
- */
-function extractCategoryId(request: NextRequest): string | null {
-  const segments = new URL(request.url).pathname.split("/").filter(Boolean);
-  return segments.at(-1) ?? null;
-}
-
-/**
- * Validação básica de entrada (Fail Fast)
- */
-function validateInput(id: string | null, input: PutHttp.Input): string | null {
-  if (!id) return "O ID da categoria é obrigatório.";
-  if (!input.name || !input.description)
-    return "Nome e descrição são obrigatórios.";
-  return null;
-}
-
-/**
  * Handler HTTP responsável por atualizar uma categoria.
  */
 export async function PUT(
   request: NextRequest
-): Promise<NextResponse<{ error: string } | PutHttp.OutPut>> {
+): Promise<NextResponse<PutHttp.OutPut | { error: string }>> {
   try {
     const body = (await request.json()) as PutHttp.Input;
-    const id = extractCategoryId(request) as string;
+    const categoryId = extractId(request) as string;
 
-    // Fail Fast
-    const validationError = validateInput(id, body);
-    if (validationError) {
-      return NextResponse.json({ error: validationError }, { status: 400 });
+    if (!categoryId) {
+      return NextResponse.json(
+        { error: "'categoryId' é obrigatório." },
+        { status: 400 }
+      );
     }
 
     const updateCategoryUseCase = makeUpdateCategoryUseCase();
-
-    const { category } = await updateCategoryUseCase.execute(id, {
+    const { category } = await updateCategoryUseCase.execute(categoryId, {
       name: body.name,
       description: body.description,
     });
+
+    if (!category) {
+      return new NextResponse(
+        JSON.stringify({ error: "Categoria não encontrada." }),
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json(
       {
@@ -66,6 +57,13 @@ export async function PUT(
     );
   } catch (error) {
     console.error("[UPDATE_CATEGORY_ERROR]", error);
+
+    if (error instanceof NotFoundError) {
+      return new NextResponse(
+        JSON.stringify({ error: "Categoria não encontrada." }),
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json(
       { error: "Erro ao atualizar a categoria." },

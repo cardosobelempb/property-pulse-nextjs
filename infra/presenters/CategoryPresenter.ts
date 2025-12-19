@@ -15,7 +15,7 @@ export namespace CategoryHttp {
     name: string;
     description: string | null;
     createdAt: string;
-    image: Image[];
+    // image: Image[];
   }
 }
 
@@ -37,7 +37,7 @@ export class CategoryPresenter {
       name: entity.name,
       description: entity.description,
       createdAt: entity.createdAt.toISOString(),
-      image: entity.image,
+      // image: entity.image,
     };
   }
 

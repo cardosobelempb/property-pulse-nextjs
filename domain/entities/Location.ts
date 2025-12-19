@@ -1,11 +1,10 @@
 import { Entity, Optional, UUIDVO } from "@/shared";
 
 export interface LocationProps {
-  id?: UUIDVO;
   street: string;
   city: string;
   state: string;
-  zipCode: string;
+  zipcode: string;
   createdAt: Date;
   updatedAt?: Date | null;
   deletedAt?: Date | null;
@@ -36,12 +35,12 @@ export class Location extends Entity<LocationProps> {
     this.props.state = state;
   }
 
-  get zipCode() {
-    return this.props.zipCode;
+  get zipcode() {
+    return this.props.zipcode;
   }
 
-  set zipCode(zipcode: string) {
-    this.props.zipCode = zipcode;
+  set zipcode(zipcode: string) {
+    this.props.zipcode = zipcode;
   }
 
   get createdAt() {

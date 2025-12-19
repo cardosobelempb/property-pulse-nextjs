@@ -1,58 +1,24 @@
 // src/application/use-cases/CreatePropertyUseCase.ts
-import { PropertyRepository } from "@/domain/application/repositories/PropertyRepository";
-import { Property } from "@/domain/entities/Property";
-import { UUIDVO } from "@/shared";
+import { PropertyPrismaRepository } from "@/domain/application/repositories/prisma";
+
+import { Property, PropertyProps } from "@/domain/entities/Property";
 
 export namespace CreateProperty {
-  export interface Request {
-    name: string;
-    description: string;
-    baths: number;
-    beds: number;
-    type: string;
-    isFeatured: boolean;
-    squareFeet: number;
-    locationId: string;
-    rateId: string;
-    userId: string;
-  }
+  export interface Input extends PropertyProps {}
 
-  export interface Response {
+  export interface OutPut {
     property: Property;
   }
 }
 
 export class CreatePropertyUseCase {
-  constructor(private readonly repository: PropertyRepository) {}
+  constructor(
+    private readonly propertyPrismaRepository: PropertyPrismaRepository
+  ) {}
 
-  async execute({
-    baths,
-    beds,
-    type,
-    name,
-    description,
-    isFeatured,
-    squareFeet,
-    locationId,
-    rateId,
-    userId,
-  }: CreateProperty.Request): Promise<CreateProperty.Response> {
-    const existing = await this.repository.findById(name);
-    if (existing) throw new Error("Já existe uma propriedade com esse nome.");
-
-    const property = Property.create({
-      baths,
-      beds,
-      description,
-      isFeatured,
-      locationId: new UUIDVO(locationId),
-      name,
-      rateId: new UUIDVO(rateId),
-      squareFeet,
-      type,
-      userId: new UUIDVO(userId),
-    });
-    await this.repository.create(property);
+  async execute(input: CreateProperty.Input): Promise<CreateProperty.OutPut> {
+    const entity = Property.create(input);
+    const property = await this.propertyPrismaRepository.insert(entity);
 
     return { property };
   }

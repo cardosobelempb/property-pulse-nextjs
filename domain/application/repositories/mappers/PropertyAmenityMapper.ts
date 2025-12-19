@@ -32,8 +32,8 @@ export class PropertyAmenityMapper
     }
 
     return PropertyAmenity.create({
-      propertyId: new UUIDVO(raw.propertyId),
-      amenityId: new UUIDVO(raw.amenityId),
+      propertyId: UUIDVO.create(raw.propertyId),
+      amenityId: UUIDVO.create(raw.amenityId),
 
       // Props herdados de AmenityProps
       name: raw.amenity.name,

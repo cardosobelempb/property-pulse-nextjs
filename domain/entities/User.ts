@@ -1,18 +1,19 @@
 import { Entity, Optional, UUIDVO } from "@/shared";
 import { Order } from "./Order";
+import { Roles } from "./enums/Roles";
 
 export interface UserProps {
-  id?: string;
+  id?: UUIDVO;
   firstName: string;
   lastName: string;
   email: string;
   password?: string | null;
   phone: string;
   image: string;
-  birthDate: Date;
-  role: number;
-  orders: Order[];
-  createdAt: Date;
+  birthDate: Date | null;
+  role: Roles;
+  // orders: Order[];
+  createdAt?: Date;
   updatedAt?: Date | null;
   deletedAt?: Date | null;
 }
@@ -58,7 +59,7 @@ export class User extends Entity<UserProps> {
     return this.props.birthDate;
   }
 
-  set birthDate(birthDate: Date) {
+  set birthDate(birthDate: Date | null) {
     this.props.birthDate = birthDate;
   }
 
@@ -74,7 +75,7 @@ export class User extends Entity<UserProps> {
     return this.props.role;
   }
 
-  set role(role: number) {
+  set role(role: Roles) {
     this.props.role = role;
   }
 
@@ -97,15 +98,17 @@ export class User extends Entity<UserProps> {
   static create(
     props: Optional<
       UserProps,
-      "orders" | "createdAt" | "deletedAt" | "updatedAt"
+      "role" | "createdAt" | "deletedAt" | "updatedAt"
     >,
     id?: UUIDVO
   ) {
     const user = new User(
       {
         ...props,
-        orders: props.orders ?? [],
+        // orders: props.orders ?? [],
+        role: props.role ?? Roles.CLIENT,
         createdAt: props.createdAt ?? new Date(),
+        birthDate: props.birthDate ?? null,
         updatedAt: props.updatedAt ?? null,
         deletedAt: props.deletedAt ?? null,
       },

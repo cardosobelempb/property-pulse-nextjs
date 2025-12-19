@@ -11,13 +11,12 @@ export class AmenityMapper {
         name: raw.name,
         createdAt: raw.createdAt,
       },
-      new UUIDVO(raw.id)
+      UUIDVO.create(raw.id)
     );
   }
 
   static toPersistence(entity: Amenity): Prisma.AmenityUncheckedCreateInput {
     return {
-      id: entity.id.getValue(),
       name: entity.name,
       createdAt: entity.createdAt,
     };

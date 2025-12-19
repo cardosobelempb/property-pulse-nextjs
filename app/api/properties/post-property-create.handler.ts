@@ -1,6 +1,9 @@
-import { makeCreateCategoryUseCase } from "@/application/factories/category";
-import { CategoryProps } from "@/domain/entities/Category";
-import { CategoryPresenter } from "@/infra/presenters/CategoryPresenter";
+import { makeCreatePropertyUseCase } from "@/application/factories/property";
+import { PropertyProps } from "@/domain/entities/Property";
+import {
+  PropertyPresenter,
+  PropertyPresenterProps,
+} from "@/infra/presenters/PropertyPresenter";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -11,9 +14,10 @@ import { NextRequest, NextResponse } from "next/server";
  */
 
 export namespace PostHttp {
-  export interface Input extends CategoryProps {}
+  export interface Input extends PropertyProps {}
+
   export type OutPut = {
-    category: CategoryPresenter;
+    property: PropertyPresenterProps;
   };
 }
 
@@ -23,6 +27,7 @@ export async function POST(
   try {
     // 1️⃣ Extrai o body da requisição
     const input: PostHttp.Input = await request.json();
+    console.log("POST =>", input);
 
     // 2️⃣ Validação básica de entrada (Fail Fast)
     if (!input.name) {
@@ -33,26 +38,34 @@ export async function POST(
     }
 
     // 3️⃣ Criação do caso de uso via Factory
-    const createCategoryUseCase = makeCreateCategoryUseCase();
+    const createPropertyUseCase = makeCreatePropertyUseCase();
 
     // 4️⃣ Execução da regra de negócio
-    const { category } = await createCategoryUseCase.execute({
+    const { property } = await createPropertyUseCase.execute({
       name: input.name,
-      description: input.description ?? "",
+      description: input.description,
+      baths: input.baths,
+      beds: input.beds,
+      isFeatured: input.isFeatured,
+      location: input.location,
+      rateId: input.rateId,
+      squareFeet: input.squareFeet,
+      type: input.type,
+      userId: input.userId,
     });
 
     const { pathname, origin } = new URL(request.url);
-    const resourceUrl = `${origin}${pathname}/${category.id}`;
+    const resourceUrl = `${origin}${pathname}/${property.id}`;
 
     // 5️⃣ Retorno HTTP correto
     return NextResponse.json(
       {
-        category: CategoryPresenter.toHTTP(category),
+        property: PropertyPresenter.toHTTP(property),
       },
       { status: 201, headers: { Location: resourceUrl } }
     );
   } catch (error) {
-    console.error("[CREATE_CATEGORY_ERROR]", error);
+    console.error("[CREATE_PROPERTY_ERROR]", error);
 
     return NextResponse.json(
       { error: "Erro interno ao criar a categoria." },

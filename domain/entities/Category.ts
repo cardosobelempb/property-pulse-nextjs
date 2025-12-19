@@ -10,10 +10,11 @@ import { Product } from "./Product";
  * - Imutabilidade controlada via invariantes.
  */
 export type CategoryProps = {
+  id?: UUIDVO;
   name: string;
   description: string | null;
-  images: Image[];
-  products: Product[];
+  // images: Image[];
+  // products: Product[];
 
   createdAt: Date;
   updatedAt: Date | null;
@@ -39,14 +40,14 @@ export class Category extends AggregateAbstract<CategoryProps> {
     return this.props.description;
   }
 
-  get image(): Image[] {
-    return this.props.images;
-  }
+  // get image(): Image[] {
+  //   return this.props.images;
+  // }
 
-  /** Expor cópia defensiva evita mutação externa acidental */
-  get products(): Product[] {
-    return [...this.props.products];
-  }
+  // /** Expor cópia defensiva evita mutação externa acidental */
+  // get products(): Product[] {
+  //   return [...this.props.products];
+  // }
 
   get createdAt(): Date {
     return this.props.createdAt;
@@ -81,27 +82,27 @@ export class Category extends AggregateAbstract<CategoryProps> {
     this.touch();
   }
 
-  updateImage(images: Image[]) {
-    this.props.images = images;
-    this.touch();
-  }
+  // updateImage(images: Image[]) {
+  //   this.props.images = images;
+  //   this.touch();
+  // }
 
   /**
    * Controle explícito sobre associação com produtos.
    * Evita inconsistência e garante integridade do agregado.
    */
-  addProduct(product: Product) {
-    const alreadyExists = this.props.products.some((p) => p.equals(product));
-    if (alreadyExists) return;
+  // addProduct(product: Product) {
+  //   const alreadyExists = this.props.products.some((p) => p.equals(product));
+  //   if (alreadyExists) return;
 
-    this.props.products.push(product);
-    this.touch();
-  }
+  //   this.props.products.push(product);
+  //   this.touch();
+  // }
 
-  removeProduct(product: Product) {
-    this.props.products = this.props.products.filter((p) => !p.equals(product));
-    this.touch();
-  }
+  // removeProduct(product: Product) {
+  //   this.props.products = this.props.products.filter((p) => !p.equals(product));
+  //   this.touch();
+  // }
 
   /** Soft delete mantendo histórico */
   softDelete() {
@@ -123,12 +124,7 @@ export class Category extends AggregateAbstract<CategoryProps> {
   static create(
     props: Optional<
       CategoryProps,
-      | "createdAt"
-      | "images"
-      | "description"
-      | "deletedAt"
-      | "updatedAt"
-      | "products"
+      "createdAt" | "description" | "deletedAt" | "updatedAt"
     >,
     id?: UUIDVO
   ): Category {
@@ -140,8 +136,8 @@ export class Category extends AggregateAbstract<CategoryProps> {
         ...props,
         name: props.name.trim(),
         description: props.description?.trim() || null,
-        images: props.images ?? [],
-        products: props.products ?? [],
+        // images: props.images ?? [],
+        // products: props.products ?? [],
 
         createdAt: props.createdAt ?? now,
         updatedAt: props.updatedAt ?? null,

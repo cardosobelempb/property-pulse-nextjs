@@ -1,6 +1,6 @@
 // infra/mappers/LocationMapper.ts
-import { Location } from "@/domain/entities/Location";
 import { Location as LocationPrisma, Prisma } from "@/app/generated/prisma";
+import { Location } from "@/domain/entities/Location";
 import { UUIDVO } from "@/shared";
 
 export class LocationMapper {
@@ -10,19 +10,18 @@ export class LocationMapper {
         state: raw.state,
         city: raw.city,
         street: raw.street,
-        zipCode: raw.zipcode,
+        zipcode: raw.zipcode,
       },
-      new UUIDVO(raw.id)
+      UUIDVO.create(raw.id)
     );
   }
 
   static toPersistence(entity: Location): Prisma.LocationUncheckedCreateInput {
     return {
-      id: entity.id.getValue(),
       state: entity.state,
       city: entity.city,
       street: entity.street,
-      zipcode: entity.zipCode,
+      zipcode: entity.zipcode,
     };
   }
 }

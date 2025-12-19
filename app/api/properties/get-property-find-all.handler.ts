@@ -1,4 +1,4 @@
-import { makeFindAllCategoryUseCase } from "@/application/factories";
+import { makeFindAllPropertyUseCase } from "@/application/factories";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -15,21 +15,21 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const size = Math.min(Math.max(Number(sizeParam) || 20, 1), 100);
 
     // 3️⃣ Executa o caso de uso
-    const findAllCategoryUseCase = makeFindAllCategoryUseCase();
+    const findAllPropertyUseCase = makeFindAllPropertyUseCase();
 
-    const result = await findAllCategoryUseCase.execute({
+    const result = await findAllPropertyUseCase.execute({
       page,
       size,
     });
 
     // 4️⃣ Retorna dados + metadados
     return NextResponse.json({
-      categories: result.categories,
+      properties: result.properties,
       pagination: {
         page,
         size,
-        total: result.categories.length,
-        totalPages: Math.ceil(result.categories.length / size),
+        total: result.properties.length,
+        totalPages: Math.ceil(result.properties.length / size),
       },
     });
   } catch (error) {

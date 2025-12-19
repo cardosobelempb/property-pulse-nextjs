@@ -1,34 +1,30 @@
 import { AggregateAbstract, Optional, UUIDVO } from "@/shared";
-import { Image } from "./Image";
-import { PropertyAmenity } from "./PropertyAmenity";
-import { Rate } from "./Rate";
 import { Location } from "./Location";
-import { User } from "./User";
-import { PropertyAmenityList } from "./PropertyAmenityList";
 
 /**
  * Tipagem oficial da entidade Property no domínio.
  * Esta tipagem representa o estado REAL da entidade, nunca um DTO externo.
  */
 export type PropertyProps = {
+  id?: UUIDVO;
   name: string;
   type: string;
   description: string;
   beds: number;
   baths: number;
   squareFeet: number;
-  amenities: PropertyAmenityList;
-  images: Image[];
-  rateId: UUIDVO;
-  rate: Rate | null;
   isFeatured: boolean;
-  locationId: UUIDVO;
-  location: Location | null;
-  userId: UUIDVO;
-  user: User | null;
-  createdAt: Date;
-  updatedAt: Date | null;
-  deletedAt: Date | null;
+  // locationId: string;
+  userId: string;
+  rateId: string;
+  // images: any[];
+  // amenities: any[];
+  // rate: Rate;
+  // user: User;
+  location: Location;
+  createdAt?: Date;
+  updatedAt?: Date | null;
+  deletedAt?: Date | null;
 };
 
 /**
@@ -72,35 +68,24 @@ export class Property extends AggregateAbstract<PropertyProps> {
   //   return [...this.props.amenities];
   // }
 
-  get amenities() {
-    return this.props.amenities;
-  }
+  // get amenities() {
+  //   return this.props.amenities;
+  // }
 
-  get images() {
-    return [...this.props.images];
-  }
+  // get images() {
+  //   return [...this.props.images];
+  // }
 
   get isFeatured() {
     return this.props.isFeatured;
   }
+
   get rateId() {
     return this.props.rateId;
   }
 
-  get rate() {
-    return this.props.rate;
-  }
-
   get userId() {
     return this.props.userId;
-  }
-
-  get user() {
-    return this.props.user;
-  }
-
-  get locationId() {
-    return this.props.locationId;
   }
 
   get location() {
@@ -115,6 +100,10 @@ export class Property extends AggregateAbstract<PropertyProps> {
   }
   get deletedAt() {
     return this.props.deletedAt;
+  }
+
+  get updateAt() {
+    return this.props.updatedAt;
   }
 
   // ----------------------
@@ -139,20 +128,20 @@ export class Property extends AggregateAbstract<PropertyProps> {
     this.touch();
   }
 
-  updateUserId(userId: UUIDVO) {
-    if (!userId.isValid()) throw new Error("UserI cannot be empty.");
+  updateUserId(userId: string) {
+    if (!userId) throw new Error("UserI cannot be empty.");
     this.props.userId = userId;
     this.touch();
   }
 
-  updateLocationId(locationId: UUIDVO) {
-    if (!locationId.isValid()) throw new Error("LocationId cannot be empty.");
-    this.props.locationId = locationId;
+  updateLocation(location: Location) {
+    if (!location) throw new Error("Location cannot be empty.");
+    this.props.location = location;
     this.touch();
   }
 
-  updateRateId(rateId: UUIDVO) {
-    if (!rateId.isValid()) throw new Error("RateId cannot be empty.");
+  updateRateId(rateId: string) {
+    if (!rateId) throw new Error("RateId cannot be empty.");
     this.props.rateId = rateId;
     this.touch();
   }
@@ -180,11 +169,11 @@ export class Property extends AggregateAbstract<PropertyProps> {
     this.touch();
   }
 
-  updateImages(images: Image[]) {
-    // poderíamos validar duplicados aqui
-    this.props.images = [...images];
-    this.touch();
-  }
+  // updateImages(images: Image[]) {
+  //   // poderíamos validar duplicados aqui
+  //   this.props.images = [...images];
+  //   this.touch();
+  // }
 
   // updateAmenities(amenities: PropertyAmenity[]) {
   //   // validação estratégica: garantir que são entidades válidas
@@ -197,10 +186,10 @@ export class Property extends AggregateAbstract<PropertyProps> {
   //   this.props.amenities = [...amenities];
   //   this.touch();
   // }
-  updateAmenities(amenities: PropertyAmenityList) {
-    this.props.amenities = amenities;
-    this.touch();
-  }
+  // updateAmenities(amenities: PropertyAmenityList) {
+  //   this.props.amenities = amenities;
+  //   this.touch();
+  // }
 
   softDelete() {
     this.props.deletedAt = new Date();
@@ -223,25 +212,14 @@ export class Property extends AggregateAbstract<PropertyProps> {
   static create(
     props: Optional<
       PropertyProps,
-      | "createdAt"
-      | "images"
-      | "amenities"
-      | "user"
-      | "rate"
-      | "location"
-      | "deletedAt"
-      | "updatedAt"
+      "createdAt" | "deletedAt" | "updatedAt" | "isFeatured"
     >,
     id?: UUIDVO
   ) {
     return new Property(
       {
         ...props,
-        images: props.images ?? [],
-        amenities: props.amenities ?? new PropertyAmenityList(),
-        user: props.user ?? null,
-        rate: props.rate ?? null,
-        location: props.location ?? null,
+        isFeatured: props.isFeatured ?? false,
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? null,
         deletedAt: props.deletedAt ?? null,

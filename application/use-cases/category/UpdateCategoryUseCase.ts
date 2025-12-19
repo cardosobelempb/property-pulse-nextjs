@@ -26,20 +26,27 @@ export class UpdateCategoryUseCase {
   constructor(private readonly categoryRepository: CategoryPrismaRepository) {}
 
   async execute(
-    id: string,
-    { name, description }: UpdateCategory.Input
+    categoryId: string,
+    input: UpdateCategory.Input
   ): Promise<UpdateCategory.Output> {
-    const data = await this.categoryRepository.findById(id);
+    const entity = await this.categoryRepository.findById(categoryId);
 
-    if (!data) {
-      throw new NotFoundError(id);
+    if (!entity) {
+      throw new NotFoundError(categoryId);
     }
 
-    data.updateName(name);
-    data.updateDescription(description);
+    this.copyInputToEntity(input, entity);
 
-    const category = await this.categoryRepository.edit(id, data);
+    const category = await this.categoryRepository.edit(categoryId, entity);
 
     return { category };
+  }
+
+  private copyInputToEntity(
+    input: UpdateCategory.Input,
+    entity: Category
+  ): void {
+    entity.updateName(input.name);
+    entity.updateDescription(input.description);
   }
 }

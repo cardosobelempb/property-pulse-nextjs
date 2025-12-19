@@ -9,18 +9,17 @@ export class ImageMapper {
     return Image.create(
       {
         url: raw.url,
-        propertyId: new UUIDVO(raw.propertyId),
+        propertyId: UUIDVO.create(raw.id),
         createdAt: raw.createdAt,
       },
-      new UUIDVO(raw.id)
+      UUIDVO.create(raw.id)
     );
   }
 
   static toPersistence(entity: Image): Prisma.ImageUncheckedCreateInput {
     return {
-      id: entity.id.getValue(),
       url: entity.url,
-      propertyId: entity.propertyId.getValue(),
+
       createdAt: entity.createdAt,
     };
   }
